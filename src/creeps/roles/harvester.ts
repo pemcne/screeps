@@ -24,8 +24,27 @@ export class Harvester implements HarvesterInterface {
     }
   }
 
+  private findSource(): Source | null {
+    return this.creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+  }
+
   public harvest(): number {
-    if (this.creep.pos.isNearTo(this.source.pos)) {
+    let source = this.source;
+    if (source === null) {
+      source = this.findSource();
+      if (source === null) {
+        console.log(this.creep.name + ": no available sources");
+        return ERR_NOT_FOUND;
+      }
     }
+    if (this.creep.pos.isNearTo(source.pos)) {
+      return this.creep.harvest(source);
+    } else {
+      return this.creep.moveTo(source);
+    }
+  }
+
+  public deposit(): number {
+    return 0;
   }
 }
