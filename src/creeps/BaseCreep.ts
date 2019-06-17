@@ -1,5 +1,8 @@
 export abstract class BaseCreep {
   public creep: Creep;
+  protected abstract body: string[];
+  protected abstract upgradedBody: string[];
+
   public constructor(creep: Creep) {
     this.creep = creep;
   }

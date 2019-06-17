@@ -1,6 +1,8 @@
 import { BaseCreep } from "creeps/BaseCreep";
 
 export class Harvester extends BaseCreep {
+  protected body = [WORK, CARRY, MOVE, MOVE];
+  protected upgradedBody = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
   get source(): Source | null {
     return Game.getObjectById<Source>(this.creep.memory.harvester.source);
   }
