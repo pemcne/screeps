@@ -4,6 +4,7 @@ export enum Role {
 
 interface HarvesterMemory {
   source: string;
+  gathering: boolean;
 }
 
 declare global {

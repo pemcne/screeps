@@ -1,8 +1,8 @@
 import { BaseCreep } from "creeps/BaseCreep";
 
 export class Harvester extends BaseCreep {
-  protected body = [WORK, CARRY, MOVE, MOVE];
-  protected upgradedBody = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+  public body = [WORK, CARRY, MOVE, MOVE];
+  public upgradedBody = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
   get source(): Source | null {
     return Game.getObjectById<Source>(this.creep.memory.harvester.source);
   }
@@ -10,28 +10,29 @@ export class Harvester extends BaseCreep {
   public constructor(creep: Creep) {
     super(creep);
   }
-
-  private findSource(): Source | null {
-    return this.creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-  }
-
-  public harvest(): number {
+  public run() {
+    if (this.creep.memory.harvester.gathering && this.isFull()) {
+      this.creep.memory.harvester.gathering = false;
+      return this.depositEnergy();
+    } else if (!this.creep.memory.harvester.gathering && this.isEmpty()) {
+      this.creep.memory.harvester.gathering = true;
+    }
+    // Need to harvest
     let source = this.source;
     if (source === null) {
-      source = this.findSource();
+      source = this.findClosestSource();
       if (source === null) {
         console.log(this.creep.name + ": no available sources");
         return ERR_NOT_FOUND;
       }
+      this.creep.memory.harvester.source = source.id;
     }
-    if (this.creep.pos.isNearTo(source.pos)) {
-      return this.creep.harvest(source);
-    } else {
-      return this.creep.moveTo(source);
-    }
+    return this.harvestEnergy(source);
   }
-
-  public deposit(): number {
-    return 0;
+  private isFull(): boolean {
+    return this.creep.carry[RESOURCE_ENERGY] === this.creep.carryCapacity;
+  }
+  private isEmpty(): boolean {
+    return this.creep.carry[RESOURCE_ENERGY] === 0;
   }
 }

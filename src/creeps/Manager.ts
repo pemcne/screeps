@@ -1,3 +1,6 @@
+import { Role } from "./roles/roles";
+import { Harvester } from "./roles/harvester";
+
 export let creeps: Creep[];
 export let creepCount: number = 0;
 
@@ -18,7 +21,14 @@ export const run = (): void => {
 
   // Spawn all missing creeps
   creeps.forEach(creep => {
-    console.log(creep.memory.role);
+    switch (creep.memory.role) {
+      case Role.Harvester:
+        const creepObject = new Harvester(creep);
+        break;
+      default:
+        console.log(`${creep.name} has no role!`);
+        break;
+    }
   });
 };
 
