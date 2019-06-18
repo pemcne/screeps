@@ -4,13 +4,29 @@ export class Harvester extends BaseCreep {
   public body = [WORK, CARRY, MOVE, MOVE];
   public upgradedBody = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
   get source(): Source | null {
+    if (!this.creep.memory.harvester) {
+      return null;
+    }
     return Game.getObjectById<Source>(this.creep.memory.harvester.source);
   }
 
   public constructor(creep: Creep) {
     super(creep);
+    if (!this.creep.memory.harvester) {
+      this.init();
+    }
+  }
+  private init(): number {
+    this.creep.memory.harvester = {
+      gathering: false,
+      source: ""
+    };
+    return OK;
   }
   public run() {
+    if (!this.creep.memory.harvester) {
+      return this.init();
+    }
     if (this.creep.memory.harvester.gathering && this.isFull()) {
       this.creep.memory.harvester.gathering = false;
       return this.depositEnergy();

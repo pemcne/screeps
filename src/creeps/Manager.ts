@@ -1,38 +1,70 @@
-import { Role } from "./roles/roles";
+import { Role, RoleMap } from "./roles/roles";
 import { Harvester } from "./roles/harvester";
 
-export let creeps: Creep[];
-export let creepCount: number = 0;
+// let creeps: Creep[];
+// let creepCount: number = 0;
+
+const clean = () => {
+  for (const name in Memory.creeps) {
+    if (!Game.creeps[name]) {
+      delete Memory.creeps[name];
+    }
+  }
+};
+const generateName = (role: string): string => `${role}-${Game.time}`;
+
+const spawnCreep = (spawn: StructureSpawn, role: Role, roleName: string, body: BodyPartConstant[]): number => {
+  const newName = `${roleName}-${Game.time}`;
+  const resp = spawn.createCreep(body, newName, { role: role });
+  if (typeof resp === "string") {
+    return OK;
+  }
+  return resp;
+};
+
+const count = (role: Role): number => {
+  const creeps = _.filter(Game.creeps, {
+    filter: (creep: Creep) => creep.memory.role === role
+  });
+  return creeps.length;
+};
+
+const allRoles = (): number[] => {
+  let output: number[] = [];
+  for (const v in Role) {
+    if (typeof Role[v] === "number") {
+      output.push(Number(v));
+    }
+  }
+  return output;
+};
 
 export const run = (): void => {
   // Automatically delete memory of missing creeps
   if (Game.time % 100 === 0) {
-    for (const name in Memory.creeps) {
-      if (!Game.creeps[name]) {
-        delete Memory.creeps[name];
-      }
-    }
+    clean();
   }
   const spawn = Game.spawns["Spawn1"];
   const roomName = Object.keys(Game.rooms)[0];
   const room = Game.rooms[roomName];
-  const energyCapacity = room.energyCapacityAvailable;
-  loadCreeps(room);
 
-  // Spawn all missing creeps
-  creeps.forEach(creep => {
-    switch (creep.memory.role) {
-      case Role.Harvester:
-        const creepObject = new Harvester(creep);
-        break;
-      default:
-        console.log(`${creep.name} has no role!`);
-        break;
+  for (const r in allRoles()) {
+    const role = (r as any) as Role;
+    const roleName = Role[role];
+    const creeps = _.filter(Game.creeps, {
+      filter: (creep: Creep) => creep.memory.role == role
+    });
+    console.log("role", Game.creeps["HARVESTER-1130"].memory.role == role);
+    const roleConfig = RoleMap[role];
+    console.log(creeps.length);
+    if (creeps.length < roleConfig.minNumber) {
+      spawnCreep(spawn, role, roleName, roleConfig.body);
     }
-  });
-};
-
-const loadCreeps = (room: Room): void => {
-  creeps = room.find<FIND_MY_CREEPS>(FIND_MY_CREEPS);
-  creepCount = _.size(creeps);
+    const classObj = roleConfig.cls;
+    creeps.forEach((creep: Creep) => {
+      console.log(creep.name);
+      const c = new classObj(creep);
+      c.run();
+    });
+  }
 };
