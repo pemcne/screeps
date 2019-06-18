@@ -38,6 +38,13 @@ export abstract class BaseCreep {
       return this.moveTo(source);
     }
   }
+  protected withdrawEnergy(target: AnyStructure): number {
+    const resp = this.creep.withdraw(target, RESOURCE_ENERGY);
+    if (resp === ERR_NOT_IN_RANGE) {
+      return this.moveTo(target);
+    }
+    return resp;
+  }
   protected depositEnergy(): number {
     let container = this.findClosestEnergyStorage();
     if (container === null) {
@@ -51,5 +58,16 @@ export abstract class BaseCreep {
       return resp;
     }
     return ERR_NOT_FOUND;
+  }
+  protected upgradeController(): number {
+    const controller = this.creep.room.controller;
+    if (!controller) {
+      return ERR_NOT_FOUND;
+    }
+    const resp = this.creep.upgradeController(controller);
+    if (resp === ERR_NOT_IN_RANGE) {
+      return this.moveTo(controller);
+    }
+    return resp;
   }
 }
