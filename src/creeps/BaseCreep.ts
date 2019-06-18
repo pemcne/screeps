@@ -1,7 +1,5 @@
 export abstract class BaseCreep {
   public creep: Creep;
-  public abstract body: string[];
-  public abstract upgradedBody: string[];
 
   public constructor(creep: Creep) {
     this.creep = creep;
@@ -22,7 +20,7 @@ export abstract class BaseCreep {
   protected moveTo(target: RoomPosition | { pos: RoomPosition }): number {
     return this.creep.moveTo(target, {
       visualizePathStyle: {
-        fill: "#ffffff"
+        stroke: "#ffffff"
       }
     });
   }

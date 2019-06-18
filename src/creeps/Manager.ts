@@ -51,18 +51,13 @@ export const run = (): void => {
   for (const r in allRoles()) {
     const role = (r as any) as Role;
     const roleName = Role[role];
-    const creeps = _.filter(Game.creeps, {
-      filter: (creep: Creep) => creep.memory.role == role
-    });
-    console.log("role", Game.creeps["HARVESTER-1130"].memory.role == role);
+    const creeps = _.filter(Game.creeps, (creep: Creep) => creep.memory.role === role);
     const roleConfig = RoleMap[role];
-    console.log(creeps.length);
     if (creeps.length < roleConfig.minNumber) {
       spawnCreep(spawn, role, roleName, roleConfig.body);
     }
     const classObj = roleConfig.cls;
     creeps.forEach((creep: Creep) => {
-      console.log(creep.name);
       const c = new classObj(creep);
       c.run();
     });
