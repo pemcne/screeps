@@ -1,8 +1,10 @@
 import { Harvester } from "./harvester";
+import { Upgrader } from "./upgrader";
 
 // Roles
 export enum Role {
-  HARVESTER
+  HARVESTER,
+  UPGRADER
 }
 export interface RoleMapElement {
   name: string;
@@ -21,6 +23,13 @@ export const RoleMap: RoleMapper = {
     body: [WORK, CARRY, MOVE, MOVE],
     upgradedBody: [WORK, WORK, CARRY, CARRY, MOVE, MOVE],
     minNumber: 2
+  },
+  [Role.UPGRADER]: {
+    name: 'upgrader',
+    cls: Upgrader,
+    body: [WORK, WORK, CARRY, MOVE],
+    upgradedBody: [WORK, WORK, WORK, WORK, CARRY, MOVE],
+    minNumber: 3
   }
 };
 
