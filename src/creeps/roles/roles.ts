@@ -37,10 +37,14 @@ interface HarvesterMemory {
   source: string;
   gathering: boolean;
 }
+interface UpgraderMemory {
+  upgrading: boolean;
+}
 
 declare global {
   interface CreepMemory {
     role: Role;
     harvester?: HarvesterMemory;
+    upgrader?: UpgraderMemory;
   }
 }

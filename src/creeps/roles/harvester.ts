@@ -45,10 +45,4 @@ export class Harvester extends BaseCreep {
     }
     return this.depositEnergy();
   }
-  private isFull(): boolean {
-    return this.creep.carry[RESOURCE_ENERGY] === this.creep.carryCapacity;
-  }
-  private isEmpty(): boolean {
-    return this.creep.carry[RESOURCE_ENERGY] === 0;
-  }
 }

@@ -7,6 +7,12 @@ export abstract class BaseCreep {
 
   public abstract run(): number;
 
+  protected isFull(): boolean {
+    return this.creep.carry[RESOURCE_ENERGY] === this.creep.carryCapacity;
+  }
+  protected isEmpty(): boolean {
+    return this.creep.carry[RESOURCE_ENERGY] === 0;
+  }
   protected findClosestEnergyStorage(): AnyStructure | null {
     const storage = this.creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: structure =>
