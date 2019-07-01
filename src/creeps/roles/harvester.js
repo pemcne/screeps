@@ -17,7 +17,7 @@ export class Harvester extends BaseCreep {
     this.creep.memory.harvester = {
       gathering: false,
       source: null
-    }
+    };
   }
   run() {
     if (this.creep.memory.harvester.gathering && this.isFull()) {

@@ -1,7 +1,7 @@
 import { Harvester } from './roles/harvester';
 import { Worker } from './roles/worker';
 
-const RolePriority = ['harvester', 'builder', 'upgrader'];
+const RolePriority = ['harvester', 'worker'];
 const RoleMap = {
   'harvester': {
     name: 'harvester',
@@ -15,7 +15,7 @@ const RoleMap = {
     cls: Worker,
     baseBody: [WORK, WORK, CARRY, MOVE],
     repeatBody: [WORK, WORK, CARRY, MOVE],
-    minNumber: 2
+    minNumber: 4
   }
 };
 
