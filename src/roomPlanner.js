@@ -1,9 +1,17 @@
 class RoomPlanner {
+  constructor() {
+    if (!Memory.sources) {
+      Memory.sources = {};
+    }
+    if (!Memory.controllers) {
+      Memory.controllers = {};
+    }
+  }
   generateRangeCoordinates(start, end) {
     return Array.from({ length: (end - start + 1) }, (v, k) => k + start);
   }
-  scanEdge(xPerm, yPerm, sX, sY) {
-    let output = []
+  scanEdge(xPerm, yPerm, sX, sY, room) {
+    let output = [];
     for (const x of xPerm) {
       const tX = sX + x;
       for (const y of yPerm) {
@@ -11,7 +19,7 @@ class RoomPlanner {
         if (tX === sX && tY === sY) {
           continue;
         }
-        output.push(new RoomPosition(tX, tY, 'sim'));
+        output.push(new RoomPosition(tX, tY, room));
       }
     }
     return output
@@ -24,8 +32,8 @@ class RoomPlanner {
     const perm = this.generateRangeCoordinates(rangeMin, rangeMax);
     const permEdge = [rangeMin, rangeMax];
     const permShort = _.xor(perm, permEdge);
-    const edgeX = this.scanEdge(perm, permEdge, sX, sY);
-    const edgeY = this.scanEdge(permEdge, permShort, sX, sY);
+    const edgeX = this.scanEdge(perm, permEdge, sX, sY, room);
+    const edgeY = this.scanEdge(permEdge, permShort, sX, sY, room);
     return [...edgeX, ...edgeY];
   }
   chooseContainer(spots, source) {
@@ -38,13 +46,13 @@ class RoomPlanner {
       return null;
     }
     const spot = spawn.pos.findClosestByPath(spots, { algorithm: 'dijkstra' });
-    new RoomVisual(spot.roomName).circle(spot.x, spot.y, { opacity: 1, fill: '#ff0000' })
+    new RoomVisual(spot.roomName).circle(spot.x, spot.y, { opacity: 1, fill: '#ff0000' });
     return spot;
   }
   findFreeSpaces(terrain, room, source, range = 1) {
     const pos = source.pos;
     const adjacent = this.getAllAdjacent(pos, room, range);
-    let freeSpaces = []
+    let freeSpaces = [];
     for (const adj of adjacent) {
       const terrainType = terrain.get(adj.x, adj.y);
       if (terrainType !== TERRAIN_MASK_WALL) {
@@ -55,32 +63,25 @@ class RoomPlanner {
     return freeSpaces;
   }
   scan() {
-    if (!Memory.sources) {
-      Memory.sources = {}
-    }
-    if (!Memory.controllers) {
-      Memory.controllers = {}
-    }
     for (const roomName in Game.rooms) {
       const room = Game.rooms[roomName];
+      const controller = room.controller;
+      const controllerRCL = controller.my ? controller.level : null;
       const terrain = room.getTerrain();
       const sources = room.find(FIND_SOURCES);
       for (const source of sources) {
-        const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
-        console.log(source.id, freeSpaces)
-        const container = this.chooseContainer(freeSpaces, source.pos);
-        Memory.sources[source.id] = {
-          numHarvesters: freeSpaces.length,
-          harvesters: [],
-          container: null,
-          _build: {
-            x: container.x,
-            y: container.y,
-            type: STRUCTURE_CONTAINER
-          }
+        if (!(source.id in Memory.sources)) {
+          const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
+          console.log(source.id, freeSpaces);
+          const container = this.chooseContainer(freeSpaces, source.pos);
+          Memory.sources[source.id] = {
+            numHarvesters: freeSpaces.length,
+            harvesters: [],
+            room: roomName,
+            container: null
+          };
         }
       }
-      const controller = room.controller;
       if (!(controller.id in Memory.controllers)) {
         if (controller.my) {
           const freeSpaces = this.findFreeSpaces(terrain, room.name, controller, 3);
@@ -88,13 +89,9 @@ class RoomPlanner {
           Memory.controllers[controller.id] = {
             numUpgraders: freeSpaces.length,
             upgraders: [],
-            container: null,
-            _build: {
-              x: container.x,
-              y: container.y,
-              type: STRUCTURE_CONTAINER
-            }
-          }
+            room: roomName,
+            container: null
+          };
         }
       }
     }

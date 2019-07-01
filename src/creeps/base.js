@@ -1,6 +1,6 @@
 class BaseCreep {
   constructor(creep) {
-    this.creep = creep
+    this.creep = creep;
   }
 
   findClosestConstructionSite() {
@@ -12,9 +12,7 @@ class BaseCreep {
   findClosestEnergyStorage() {
     const storage = this.creep.pos.findClosestByPath(FIND_STRUCTURES, {
       filter: s => {
-        const structureType = s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_STORAGE;
-        const energy = s.store[RESOURCE_ENERGY] > 0;
-        return structureType && energy;
+        return (s.structureType === STRUCTURE_CONTAINER || s.structureType === STRUCTURE_STORAGE) && s.store[RESOURCE_ENERGY] > 0;
       }
     });
     return storage;
@@ -37,9 +35,16 @@ class BaseCreep {
   }
   depositEnergy() {
     let container = this.findClosestEnergyStorage();
-    if (container && _.sum(container.store) === container.storeCapacity) {
-      container = this.creep.pos.findClosestByPath(FIND_MY_SPAWNS);
-      if (container.energy === container.energyCapacity) {
+    if (container === null || _.sum(container.store) === container.storeCapacity) {
+      container = this.creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        filter: (s) => {
+          if (s.structureType in [STRUCTURE_EXTENSION, STRUCTURE_SPAWN]) {
+            return s.energy < s.energyCapacity;
+          }
+          return false;
+        }
+      });
+      if (container === null) {
         return ERR_FULL;
       }
     }
@@ -73,7 +78,7 @@ class BaseCreep {
   repair(target) {
     const resp = this.creep.repair(target);
     if (resp === ERR_NOT_IN_RANGE) {
-      return this.creep.moveTo(target);
+      return this.moveTo(target);
     }
     return resp;
   }
@@ -94,4 +99,6 @@ class BaseCreep {
   }
 }
 
-export { BaseCreep };
+export {
+  BaseCreep
+};
