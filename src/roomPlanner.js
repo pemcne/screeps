@@ -36,11 +36,18 @@ class RoomPlanner {
     const edgeY = this.scanEdge(permEdge, permShort, sX, sY, room);
     return [...edgeX, ...edgeY];
   }
-  chooseContainer(spots, source) {
+  chooseContainer(room, spots, source) {
     // This does a really basic lookup and chooses the closest of the
     // spots to the closest spawn, should be "good enough" for a container
     // First find the closest spawn
     const spawn = source.findClosestByPath(FIND_MY_SPAWNS);
+    // const path = room.findPath(spawn.pos, source, {
+    //   range: 1,
+    //   ignoreCreeps: true
+    // });
+    // path.forEach((p) => {
+    //   new RoomVisual(room.name).circle(p.x, p.y, { fill: '#00ff00'});
+    // });
     if (spawn === null) {
       // This really shouldn't happen...
       return null;
@@ -62,6 +69,39 @@ class RoomPlanner {
     }
     return freeSpaces;
   }
+  canBuild(room, structure, rcl) {
+    // Pulls the structure from CONTROLLER_STRUCTURES
+    // Compares against built structures and returns boolean
+    if (!(rcl in CONTROLLER_STRUCTURES[structure])) {
+      return ERR_NOT_FOUND;
+    }
+    const avail = CONTROLLER_STRUCTURES[structure][rcl];
+    const built = room.find(FIND_STRUCTURES, {
+      filter: s => s.structureType === structure
+    });
+    return built.length < avail;
+  }
+  findAt(room, pos, type) {
+    const sites = room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y);
+    sites.forEach((i) => {
+      console.log(i.type, i.id);
+      if (i.type ===  LOOK_CONSTRUCTION_SITES) {
+        console.log('found construction', i.id);
+        return i.id;
+      }
+    });
+  }
+  build(room, pos, structure) {
+    // Returns the id of the construction site if successful
+    // Returns null otherwise
+    if (this.canBuild(room, structure, room.controller.level)) {
+      const resp = room.createConstructionSite(pos, structure);
+      if (!resp) {
+        console.log('build success', pos.x, pos.y);
+      }
+    }
+    return null;
+  }
   scan() {
     for (const roomName in Game.rooms) {
       const room = Game.rooms[roomName];
@@ -70,30 +110,56 @@ class RoomPlanner {
       const terrain = room.getTerrain();
       const sources = room.find(FIND_SOURCES);
       for (const source of sources) {
-        if (!(source.id in Memory.sources)) {
-          const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
-          console.log(source.id, freeSpaces);
-          const container = this.chooseContainer(freeSpaces, source.pos);
-          Memory.sources[source.id] = {
+        const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
+        let memSource = Memory.sources[source.id];
+        if (memSource === undefined) {
+          let params = {
             numHarvesters: freeSpaces.length,
             harvesters: [],
             room: roomName,
-            container: null
+            container: null,
+            _build: null
           };
+          memSource = params;
         }
-      }
-      if (!(controller.id in Memory.controllers)) {
-        if (controller.my) {
-          const freeSpaces = this.findFreeSpaces(terrain, room.name, controller, 3);
-          const container = this.chooseContainer(freeSpaces, controller.pos);
-          Memory.controllers[controller.id] = {
-            numUpgraders: freeSpaces.length,
-            upgraders: [],
-            room: roomName,
-            container: null
-          };
+        if (memSource.container === null && memSource._build === null) {
+          // Build was unsuccessful last time
+          const container = this.chooseContainer(room, freeSpaces, source.pos);
+          const siteId = this.build(room, container, STRUCTURE_CONTAINER);
+          if (siteId) {
+            memSource._build = {
+              id: siteId,
+              type: STRUCTURE_CONTAINER,
+              x: container.x,
+              y: container.y
+            }
+          }
+        } else if (memSource.container === null && memSource._build !== null) {
+          // Construction in progress, check on it
+          const buildSite = memSource._build;
+          const site = Game.getObjectById(buildSite.id);
+          if (site === null) {
+            // Construction complete
+            const spots = room.lookForAt(LOOK_STRUCTURES, buildSite.x, buildSite.y);
+            const siteBuilding = _.filter(spots, (s) => s.structureType === buildSite.type);
+            console.log(siteBuilding);
+          }
         }
+        // Store back into memory
+        Memory.sources[source.id] = memSource;
       }
+      // if (controller.my) {
+      //   if (!(controller.id in Memory.controllers)) {
+      //     const freeSpaces = this.findFreeSpaces(terrain, room.name, controller, 3);
+      //     const container = this.chooseContainer(room, freeSpaces, controller.pos);
+      //     Memory.controllers[controller.id] = {
+      //       numUpgraders: freeSpaces.length,
+      //       upgraders: [],
+      //       room: roomName,
+      //       container: null
+      //     };
+      //   }
+      // }
     }
   }
 }
