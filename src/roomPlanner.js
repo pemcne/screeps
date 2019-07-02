@@ -82,7 +82,7 @@ class RoomPlanner {
     return built.length < avail;
   }
   findAt(room, pos, type) {
-    const sites = room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y);
+    const sites = room.lookForAt(LOOK_CONSTRUCTION_SITES, pos);
     sites.forEach((i) => {
       console.log(i.type, i.id);
       if (i.type ===  LOOK_CONSTRUCTION_SITES) {
@@ -95,10 +95,7 @@ class RoomPlanner {
     // Returns the id of the construction site if successful
     // Returns null otherwise
     if (this.canBuild(room, structure, room.controller.level)) {
-      const resp = room.createConstructionSite(pos, structure);
-      if (!resp) {
-        console.log('build success', pos.x, pos.y);
-      }
+      return room.createConstructionSite(pos, structure);
     }
     return null;
   }
@@ -125,10 +122,10 @@ class RoomPlanner {
         if (memSource.container === null && memSource._build === null) {
           // Build was unsuccessful last time
           const container = this.chooseContainer(room, freeSpaces, source.pos);
-          const siteId = this.build(room, container, STRUCTURE_CONTAINER);
-          if (siteId) {
+          const resp = this.build(room, container, STRUCTURE_CONTAINER);
+          console.log('resp build', resp);
+          if (!resp) {
             memSource._build = {
-              id: siteId,
               type: STRUCTURE_CONTAINER,
               x: container.x,
               y: container.y
@@ -141,8 +138,18 @@ class RoomPlanner {
           if (site === null) {
             // Construction complete
             const spots = room.lookForAt(LOOK_STRUCTURES, buildSite.x, buildSite.y);
+            // Since you are looking for a single building at a single spot, assume it's first
             const siteBuilding = _.filter(spots, (s) => s.structureType === buildSite.type);
-            console.log(siteBuilding);
+            if (siteBuilding.length > 0) {
+              memSource.container = siteBuilding[0].id;
+              console.log('build complete', memSource.container);
+              memSource._build = null;
+            }
+          }
+        } else if (memSource.container) {
+          // Just check if it's valid
+          if (!(Game.getObjectById(memSource.container))) {
+            memSource.container = null;
           }
         }
         // Store back into memory
