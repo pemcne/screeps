@@ -49,10 +49,10 @@ class RoomPlanner {
     }
     const goal = {
       pos: source,
-      range: range
+      range: 1
     };
     const path = PathFinder.search(spawn.pos, goal, {heuristicWeight: 2});
-    const spot = path.path[path.path.length - 1];
+    const spot = path.path[path.path.length - range];
     new RoomVisual(room.name).circle(spot.x, spot.y, { opacity: 1, fill: '#ff0000' });
     return spot;
   }
