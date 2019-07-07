@@ -1,7 +1,57 @@
+import ActionManager from '../actions/manager';
+
 class BaseCreep {
   constructor(creep) {
     this.creep = creep;
+    this.actions = this.loadActions();
   }
+
+  loadActions() {
+    let allActions = [];
+    let memActions = this.creep.memory.actions;
+    if (memActions === undefined) {
+      memActions = [];
+    }
+    memActions.forEach((a) => {
+      const action = ActionManager.load(this.creep, a);
+      // figure out which way to push this in
+      allActions.push(action);
+    });
+    return allActions;
+  }
+
+  run() {
+    console.log(this.actions);
+    if (this.actions.length === 0) {
+      console.log('No actions?');
+      return
+    }
+    const action = this.actions[0];
+    if (action.isComplete()) {
+      this.actions.shift();
+      // See if there's a follow up action to put in the queue
+      const resp = this.actionComplete(action);
+      if (resp) {
+        console.log('got a follow up action', resp.type);
+        this.actions.push(resp);
+      }
+      if (action.repeat) {
+        this.actions.push(action);
+      }
+      this.run();
+    } else {
+      const resp = action.run();
+      if (resp) {
+        // Got a referral
+        const referral = ActionManager.load(this.creep, resp);
+        this.actions.unshift(referral);
+        this.run();
+      }
+    }
+    // Store the state in memory
+    this.creep.memory.actions = this.actions;
+  }
+
 
   findClosestConstructionSite() {
     return this.creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);

@@ -1,8 +1,7 @@
 import Action from "./base";
 
 export default class Harvest extends Action {
-  constructor(creep, type, data) {
-    super(creep, type, data);
+  init() {
     this.source = Game.getObjectById(this.data.target);
   }
   isComplete() {
@@ -10,11 +9,14 @@ export default class Harvest extends Action {
   }
   run() {
     // See if we need to refer to moveTo
-    if (!this.creep.isNearTo(this.source)) {
+    if (!this.creep.pos.isNearTo(this.source)) {
       const referral = {
         type: 'move',
         data: {
-          target: this.data.source
+          target: {
+            x: this.source.pos.x,
+            y: this.source.pos.y
+          }
         }
       };
       return referral;
