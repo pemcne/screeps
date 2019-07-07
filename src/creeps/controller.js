@@ -29,7 +29,15 @@ class CreepController {
       }
       const classObj = roleConfig.cls;
       creeps.forEach(creep => {
+        if (creep.spawning) {
+          // Skip since we are spawning
+          return;
+        }
         const c = new classObj(creep);
+        if (c.actions.length === 0) {
+          creep.memory.actions = classObj.getInitialActions();
+          c.loadActions();
+        }
         c.run();
       })
     }

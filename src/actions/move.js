@@ -1,15 +1,17 @@
 import Action from "./base";
 
 export default class Move extends Action {
-  constructor(creep, type, data) {
-    super(creep, type, data);
-    this.target = Game.getObjectById(this.data.target);
+  init() {
+    this.target = this.data.target;
   }
   isComplete() {
-    return this.creep.isNearTo(this.target);
+    return this.creep.pos.isNearTo(this.target.x, this.target.y);
   }
   run() {
-    this.creep.moveTo(target, {
+    if (this.creep.fatigue) {
+      return;
+    }
+    this.creep.moveTo(this.target.x, this.target.y, {
       reusePath: 20,
       visualizePathStyle: {
         stroke: '#dddddd'
