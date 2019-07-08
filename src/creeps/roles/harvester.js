@@ -56,7 +56,8 @@ export class Harvester extends BaseCreep {
           type: 'transfer',
           data: {
             target: target,
-            type: RESOURCE_ENERGY
+            type: RESOURCE_ENERGY,
+            direction: 'deposit'
           }
         }
         return ActionManager.load(this.creep, referral);
