@@ -5,6 +5,7 @@ export default class Transfer extends Action {
     this.target = this.findTarget(this.data.target);
     this.resourceType = this.data.type;
     this.amount = this.data.amount;
+    this.direction = this.data.direction;
   }
   findTarget(target) {
     let obj = Game.getObjectById(target);
@@ -43,10 +44,16 @@ export default class Transfer extends Action {
       };
       return referral;
     }
+    let fn;
+    if (this.direction === 'deposit') {
+      fn = this.creep.transfer;
+    } else if (this.direction === 'withdraw') {
+      fn = this.creep.withdraw;
+    }
     if (this.amount) {
-      this.creep.transfer(this.target, this.resourceType, this.amount);
+      fn(this.target, this.resourceType, this.amount);
     } else {
-      this.creep.transfer(this.target, this.resourceType);
+      fn(this.target, this.resourceType);
     }
   }
 }
