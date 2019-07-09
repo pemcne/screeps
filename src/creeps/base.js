@@ -43,17 +43,16 @@ class BaseCreep {
       }
       this.run();
     } else {
-      const resp = action.run();
+      let resp = action.run();
       if (resp) {
         // Got a referral
         // Need to see if we need to construct the referral or not?
         if (resp.type === 'query') {
           const fn = this.queryActions[resp.query];
-          const action = fn();
-          this.actions.unshift(action);
-        } else {
-          this.actions.unshift(resp);
+          resp = fn();
         }
+        const referral = ActionManager.load(this.creep, resp);
+        this.actions.unshift(referral);
         this.run();
       }
     }
@@ -97,7 +96,7 @@ class BaseCreep {
         }
       }
     }
-    return ActionManager.load(action);
+    return action;
   }
   build(target) {
     const resp = this.creep.build(target);

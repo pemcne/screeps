@@ -1,5 +1,4 @@
 import Action from './base';
-import ActionManager from './manager';
 
 export default class Upgrade extends Action {
   init() {
@@ -26,7 +25,7 @@ export default class Upgrade extends Action {
           }
         }
       };
-      return ActionManager.load(this.creep, referral);
+      return referral;
     }
     this.creep.upgradeController(this.target);
   }

@@ -1,5 +1,4 @@
 import Action from "./base";
-import ActionManager from './manager';
 
 export default class Transfer extends Action {
   init() {
@@ -43,7 +42,7 @@ export default class Transfer extends Action {
           }
         }
       };
-      return ActionManager(this.creep, referral);
+      return referral;
     }
     let fn;
     if (this.direction === 'deposit') {

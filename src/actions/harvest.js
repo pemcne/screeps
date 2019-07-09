@@ -1,5 +1,4 @@
 import Action from "./base";
-import ActionManager from './manager';
 
 export default class Harvest extends Action {
   init() {
@@ -20,7 +19,7 @@ export default class Harvest extends Action {
           }
         }
       };
-      return ActionManager.load(this.creep, referral);
+      return referral;
     }
     this.creep.harvest(this.source);
   }
