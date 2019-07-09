@@ -10,7 +10,13 @@ export default class Upgrade extends Action {
     return false;
   }
   run () {
-    if (!this.creep.pos.inRangeTo(this.target, 3)) {
+    if (this.creep.carry[RESOURCE_ENERGY] === 0) {
+      const referral = {
+        type: 'query',
+        query: 'getEnergy'
+      }
+      return referral;
+    } else if (!this.creep.pos.inRangeTo(this.target, 3)) {
       const referral = {
         type: 'move',
         data: {
@@ -21,9 +27,6 @@ export default class Upgrade extends Action {
         }
       };
       return ActionManager.load(this.creep, referral);
-    }
-    if (this.creep.carry[RESOURCE_ENERGY] === 0) {
-      // Get the closest container or harvest?
     }
     this.creep.upgradeController(this.target);
   }

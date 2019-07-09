@@ -9,7 +9,13 @@ export default class Build extends Action {
     return this.target === null
   }
   run() {
-    if (!this.creep.pos.isRangeTo(this.target, 3)) {
+    if (this.creep.carry.RESOURCE_ENERGY === 0) {
+      const referral = {
+        type: 'query',
+        query: 'getEnergy'
+      }
+      return referral;
+    } else if (!this.creep.pos.isRangeTo(this.target, 3)) {
       const referral = {
         type: 'move',
         data: {
@@ -21,7 +27,6 @@ export default class Build extends Action {
       };
       return ActionManager.load(this.creep, referral);
     }
-    // Get energy if out?
     this.creep.build(this.target);
   }
 }

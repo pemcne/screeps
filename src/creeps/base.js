@@ -4,6 +4,9 @@ class BaseCreep {
   constructor(creep) {
     this.creep = creep;
     this.actions = this.loadActions();
+    this.queryActions = {
+      'getEnergy': this.findEnergy
+    }
   }
 
   loadActions() {
@@ -43,7 +46,14 @@ class BaseCreep {
       const resp = action.run();
       if (resp) {
         // Got a referral
-        this.actions.unshift(resp);
+        // Need to see if we need to construct the referral or not?
+        if (resp.type === 'query') {
+          const fn = this.queryActions[resp.query];
+          const action = fn();
+          this.actions.unshift(action);
+        } else {
+          this.actions.unshift(resp);
+        }
         this.run();
       }
     }
@@ -68,12 +78,26 @@ class BaseCreep {
   }
   findEnergy() {
     const container = this.findClosestEnergyStorage();
+    let action;
     if (container === null) {
       const source = this.findClosestSource();
-      this.harvestEnergy(source);
+      action = {
+        type: 'harvest',
+        data: {
+          target: source.id
+        }
+      }
     } else {
-      this.withdraw(container);
+      action = {
+        type: 'transfer',
+        data: {
+          target: container.id,
+          type: RESOURCE_ENERGY,
+          direction: 'withdraw'
+        }
+      }
     }
+    return ActionManager.load(action);
   }
   build(target) {
     const resp = this.creep.build(target);
