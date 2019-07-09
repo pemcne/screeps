@@ -1,4 +1,5 @@
 import Action from './base';
+import ActionManager from './manager';
 
 export default class Upgrade extends Action {
   init() {
@@ -19,7 +20,7 @@ export default class Upgrade extends Action {
           }
         }
       };
-      return referral;
+      return ActionManager.load(this.creep, referral);
     }
     if (this.creep.carry[RESOURCE_ENERGY] === 0) {
       // Get the closest container or harvest?

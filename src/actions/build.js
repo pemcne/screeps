@@ -1,4 +1,5 @@
 import Action from "./base";
+import ActionManager from './manager';
 
 export default class Build extends Action {
   init() {
@@ -18,7 +19,7 @@ export default class Build extends Action {
           }
         }
       };
-      return referral;
+      return ActionManager.load(this.creep, referral);
     }
     // Get energy if out?
     this.creep.build(this.target);

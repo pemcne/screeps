@@ -43,8 +43,7 @@ class BaseCreep {
       const resp = action.run();
       if (resp) {
         // Got a referral
-        const referral = ActionManager.load(this.creep, resp);
-        this.actions.unshift(referral);
+        this.actions.unshift(resp);
         this.run();
       }
     }
