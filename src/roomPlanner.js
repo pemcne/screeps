@@ -99,7 +99,7 @@ class RoomPlanner {
     }
     return null;
   }
-  buildContainer(target, room, terrain, range, memTarget, defaultParams) {
+  buildContainer(target, room, terrain, range, memTarget, memKey, defaultParams) {
     if (memTarget === undefined) {
       memTarget = defaultParams;
     }
@@ -107,20 +107,27 @@ class RoomPlanner {
       const freeSpaces = this.findFreeSpaces(terrain, room.name, target, range);
       memTarget.freeSpaces = freeSpaces.length;
     }
-    if (memTarget.container === null && memTarget._build === null) {
+    if (memTarget.container === null && memTarget._pos === null) {
       // Build was unsuccessful last time
       const container = this.chooseContainer(room, target.pos, range);
       const resp = this.build(room, container, STRUCTURE_CONTAINER);
       if (!resp) {
-        memTarget._build = {
-          type: STRUCTURE_CONTAINER,
+        memTarget._pos = {
           x: container.x,
           y: container.y
         }
+        Memory.construction.push({
+          pos: {
+            x: container.x,
+            y: container.y
+          },
+          key: memKey,
+          id: null
+        })
       }
-    } else if (memTarget.container === null && memTarget._build !== null) {
+    } else if (memTarget.container === null && memTarget._pos !== null) {
       // Construction in progress, check on it
-      const buildSite = memTarget._build;
+      const buildSite = memTarget._pos;
       const site = Game.getObjectById(buildSite.id);
       if (site === null) {
         // Construction complete
@@ -129,7 +136,7 @@ class RoomPlanner {
         const siteBuilding = _.filter(spots, (s) => s.structureType === buildSite.type);
         if (siteBuilding.length > 0) {
           memTarget.container = siteBuilding[0].id;
-          memTarget._build = null;
+          memTarget._pos = null;
         }
       }
     } else if (memTarget.container) {
@@ -153,9 +160,10 @@ class RoomPlanner {
           harvesters: [],
           room: roomName,
           container: null,
-          _build: null
+          _pos: null
         };
-        memSource = this.buildContainer(source, room, terrain, 1, memSource, params);
+        key = `sources.${source.id}.container`
+        memSource = this.buildContainer(source, room, terrain, 1, memSource, key, params);
         // Store back into memory
         Memory.sources[source.id] = memSource;
       }
@@ -165,7 +173,7 @@ class RoomPlanner {
           upgraders: [],
           room: roomName,
           container: null,
-          _build: null
+          _pos: null
         }
         memController = this.buildContainer(controller, room, terrain, 3, memController, params);
         // Store back into memory
