@@ -99,13 +99,9 @@ class RoomPlanner {
     }
     return null;
   }
-  buildContainer(target, room, terrain, range, memTarget, memKey, defaultParams) {
+  buildContainer(target, room, range, memTarget, memKey, defaultParams) {
     if (memTarget === undefined) {
       memTarget = defaultParams;
-    }
-    if (range == 1) {
-      const freeSpaces = this.findFreeSpaces(terrain, room.name, target, range);
-      memTarget.freeSpaces = freeSpaces.length;
     }
     if (memTarget.container === null && memTarget._pos === null) {
       // Build was unsuccessful last time
@@ -156,7 +152,9 @@ class RoomPlanner {
       const sources = room.find(FIND_SOURCES);
       for (const source of sources) {
         let memSource = Memory.sources[source.id];
+        const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
         const params = {
+          freeSpaces: freeSpaces.length,
           harvesters: [],
           room: roomName,
           container: null,
