@@ -6,6 +6,9 @@ class RoomPlanner {
     if (!Memory.controllers) {
       Memory.controllers = {};
     }
+    if (!Memory.constructionSites) {
+      Memory.constructionSites = [];
+    }
   }
   generateRangeCoordinates(start, end) {
     return Array.from({ length: (end - start + 1) }, (v, k) => k + start);
@@ -82,24 +85,39 @@ class RoomPlanner {
     return built.length < avail;
   }
   findAt(room, pos, type) {
-    const sites = room.lookForAt(LOOK_CONSTRUCTION_SITES, pos);
+    const sites = room.lookForAt(LOOK_STRUCTURES, pos);
     sites.forEach((i) => {
       console.log(i.type, i.id);
-      if (i.type ===  LOOK_CONSTRUCTION_SITES) {
-        console.log('found construction', i.id);
+      if (i.type ===  type) {
         return i.id;
       }
     });
+  }
+  buildComplete(siteId) {
+    _.remove(Memory.constructionSites, (s) => s.id === siteId);
   }
   build(room, pos, structure) {
     // Returns the id of the construction site if successful
     // Returns null otherwise
     if (this.canBuild(room, structure, room.controller.level)) {
-      return room.createConstructionSite(pos.x, pos.y, structure);
+      const resp = room.createConstructionSite(pos.x, pos.y, structure);
+      if (!resp) {
+        // Build succeeded
+        const site = {
+          x: pos.x,
+          y: pos.y,
+          type: structure,
+          room: room.name,
+          id: null,
+          workers: []
+        };
+        Memory.constructionSites.push(site);
+      }
+      return resp;
     }
     return null;
   }
-  buildContainer(target, room, range, memTarget, memKey, defaultParams) {
+  buildContainer(target, room, range, memTarget, defaultParams) {
     if (memTarget === undefined) {
       memTarget = defaultParams;
     }
@@ -110,29 +128,21 @@ class RoomPlanner {
       if (!resp) {
         memTarget._pos = {
           x: container.x,
-          y: container.y
+          y: container.y,
+          type: STRUCTURE_CONTAINER
         }
-        Memory.construction.push({
-          pos: {
-            x: container.x,
-            y: container.y
-          },
-          key: memKey,
-          id: null
-        })
       }
     } else if (memTarget.container === null && memTarget._pos !== null) {
       // Construction in progress, check on it
-      const buildSite = memTarget._pos;
-      const site = Game.getObjectById(buildSite.id);
-      if (site === null) {
-        // Construction complete
-        const spots = room.lookForAt(LOOK_STRUCTURES, buildSite.x, buildSite.y);
-        // Since you are looking for a single building at a single spot, assume it's first
-        const siteBuilding = _.filter(spots, (s) => s.structureType === buildSite.type);
-        if (siteBuilding.length > 0) {
-          memTarget.container = siteBuilding[0].id;
-          memTarget._pos = null;
+      const buildPos = memTarget._pos;
+      const site = _.find(Memory.constructionSites, (s) => {
+        return s.x === buildPos.x && s.y === buildPos.y && s.type === buildPos.type
+      });
+      if (!site) {
+        const pos = new RoomPosition(buildPos.x, buildPos.y, room.name);
+        const building = this.findAt(room, pos, buildPos.type);
+        if (building) {
+          memTarget.container = building.id;
         }
       }
     } else if (memTarget.container) {
@@ -160,8 +170,7 @@ class RoomPlanner {
           container: null,
           _pos: null
         };
-        key = `sources.${source.id}.container`
-        memSource = this.buildContainer(source, room, terrain, 1, memSource, key, params);
+        memSource = this.buildContainer(source, room, 1, memSource, params);
         // Store back into memory
         Memory.sources[source.id] = memSource;
       }
@@ -173,7 +182,7 @@ class RoomPlanner {
           container: null,
           _pos: null
         }
-        memController = this.buildContainer(controller, room, terrain, 3, memController, params);
+        memController = this.buildContainer(controller, room, 3, memController, params);
         // Store back into memory
         Memory.controllers[controller.id] = memController;
       }

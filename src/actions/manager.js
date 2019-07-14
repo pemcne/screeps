@@ -19,7 +19,7 @@ class ActionManager {
       console.log('Action type does not exist');
     }
     const repeat = data.repeat ? data.repeat : false;
-    console.log('Making action', data.type, repeat);
+    // console.log('Making action', data.type, repeat);
     const actionObj = new actionClass(creep, data.type, data.data, repeat);
     return actionObj;
   }
