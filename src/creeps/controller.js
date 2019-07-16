@@ -12,6 +12,32 @@ class CreepController {
   generateName(role) {
     return `${role}-${Game.time}`;
   }
+  checkBuilds(workers) {
+    const sites = Memory.constructionSites;
+    sites.forEach((s) => {
+      const construction = Game.getObjectById(s.id);
+      if (s.numWorkers === undefined) {
+        // Assume that each worker will contribute 1000
+        s.numWorkers = construction.progressTotal / 1000;
+      }
+      const numWorkers = s.numWorkers;
+      if (s.workers.length < numWorkers) {
+        const diff = numWorkers - s.workers.length;
+        const freeWorkers = _.filter(workers, {
+          filter: (worker) => worker.available
+        });
+        if (freeWorkers.length == 0) {
+          // Try and spawn new workers
+        } else {
+          const builders = construction.pos.findClosestNByPath(freeWorkers, diff);
+          builders.forEach((b) => {
+            // Assign build task to workers here
+            b.available = false;
+          });
+        }
+      }
+    });
+  }
   run() {
     // Need to clean
     if (Game.time % 100 === 0) {
