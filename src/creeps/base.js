@@ -9,6 +9,11 @@ class BaseCreep {
     }
   }
 
+  addAction(action) {
+    const a = ActionManager.load(this.creep, action);
+    this.actions.unshift(a);
+  }
+
   loadActions() {
     let allActions = [];
     let memActions = this.creep.memory.actions;
