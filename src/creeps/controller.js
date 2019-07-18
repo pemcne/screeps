@@ -29,14 +29,8 @@ class CreepController {
         if (freeWorkers.length == 0) {
           // Try and spawn new workers
         } else {
-          const builders = construction.pos.findClosestNByPath(freeWorkers.map(i => i.creep), diff);
-          // Got returned actual creep objects, convert that back to class objects
-          const builderObjs = builders.map(i => {
-            return _.find(freeWorkers, {
-              filter: w => w.creep.name === i.name
-            });
-          });
-          builderObjs.forEach((b) => {
+          const builders = construction.pos.findClosestNByPath(freeWorkers, diff);
+          builders.forEach((b) => {
             const action = {
               type: 'build',
               data: {

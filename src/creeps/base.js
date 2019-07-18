@@ -9,6 +9,10 @@ class BaseCreep {
     }
   }
 
+  get pos() {
+    return this.creep.pos;
+  }
+
   addAction(action) {
     const a = ActionManager.load(this.creep, action);
     this.actions.unshift(a);
