@@ -1,8 +1,8 @@
 import { BaseCreep } from "../base";
 
 export class Worker extends BaseCreep {
-  static getInitialActions() {
-    const controller = this.creep.room.controller;
+  static getInitialActions(room) {
+    const controller = room.controller;
     return [{
       type: 'upgrade',
       data: {

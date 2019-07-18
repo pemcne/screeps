@@ -52,12 +52,15 @@ class CreepController {
     const spawn = Game.spawns.Spawn1;
     const roomName = Object.keys(Game.rooms)[0];
     const room = Game.rooms[roomName];
+    let spawning = false;
     // Run through all creeps
     for (const role of RolePriority) {
       const creeps = _.filter(Game.creeps, creep => creep.memory.role === role);
       const roleConfig = RoleMap[role];
-      if (creeps.length < roleConfig.minNumber) {
+      if (creeps.length < roleConfig.minNumber && !spawning) {
         this.spawn(spawn, role, roleConfig.baseBody);
+        // Since the last one is what actually spawns, have to block once we start
+        spawning = true;
       }
       const classObj = roleConfig.cls;
       creeps.forEach(creep => {
@@ -67,7 +70,7 @@ class CreepController {
         }
         const c = new classObj(creep);
         if (c.actions.length === 0) {
-          creep.memory.actions = classObj.getInitialActions();
+          creep.memory.actions = classObj.getInitialActions(room);
           c.loadActions();
         }
         c.run();

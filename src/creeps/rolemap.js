@@ -1,7 +1,7 @@
 import { Harvester } from './roles/harvester';
 import { Worker } from './roles/worker';
 
-const RolePriority = ['harvester'];
+const RolePriority = ['worker', 'harvester'];
 const RoleMap = {
   'harvester': {
     name: 'harvester',

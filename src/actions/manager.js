@@ -1,13 +1,15 @@
 import Harvest from "./harvest";
 import Move from "./move";
 import Transfer from './transfer';
+import Upgrade from "./upgrade";
 
 class ActionManager {
   constructor() {
     this.map = {
       harvest: Harvest,
       move: Move,
-      transfer: Transfer
+      transfer: Transfer,
+      upgrade: Upgrade
     };
   }
   load(creep, data) {
