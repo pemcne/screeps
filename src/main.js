@@ -1,5 +1,5 @@
 import CreepController from './creeps/controller';
-import './utils/pathing';
+import './prototypes';
 import RoomPlanner from './roomPlanner';
 
 export const loop = () => {

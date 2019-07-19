@@ -56,7 +56,7 @@ class CreepController {
     const room = Game.rooms[roomName];
     let spawning = false;
     // Assign workers to construction sites
-    this.checkBuilds();
+    // this.checkBuilds();
     // Run through all creeps
     for (const role of RolePriority) {
       const creeps = _.filter(Game.creeps, creep => creep.memory.role === role);
