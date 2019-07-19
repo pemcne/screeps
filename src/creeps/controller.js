@@ -12,8 +12,10 @@ class CreepController {
   generateName(role) {
     return `${role}-${Game.time}`;
   }
-  checkBuilds(workers) {
+  checkBuilds() {
+    const workers = _.filter(Game.creeps, creep => creep.memory.role === 'worker');
     const sites = Memory.constructionSites;
+    console.log(sites);
     sites.forEach((s) => {
       const construction = Game.getObjectById(s.id);
       if (s.numWorkers === undefined) {
@@ -53,6 +55,8 @@ class CreepController {
     const roomName = Object.keys(Game.rooms)[0];
     const room = Game.rooms[roomName];
     let spawning = false;
+    // Assign workers to construction sites
+    this.checkBuilds();
     // Run through all creeps
     for (const role of RolePriority) {
       const creeps = _.filter(Game.creeps, creep => creep.memory.role === role);

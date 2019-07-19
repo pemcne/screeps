@@ -3,9 +3,11 @@ import Action from "./base";
 export default class Move extends Action {
   init() {
     this.target = this.data.target;
+    this.range = this.data.range ? this.data.range : 1;
   }
   isComplete() {
-    return this.creep.pos.isNearTo(this.target.x, this.target.y);
+    console.log('range', this.range);
+    return this.creep.pos.inRangeTo(this.target.x, this.target.y, this.range);
   }
   run() {
     if (this.creep.fatigue) {

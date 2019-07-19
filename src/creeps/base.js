@@ -32,6 +32,10 @@ class BaseCreep {
     return allActions;
   }
 
+  actionComplete(action) {
+    return null;
+  }
+
   run() {
     console.log(this.actions);
     if (this.actions.length === 0) {
@@ -58,7 +62,7 @@ class BaseCreep {
         // Need to see if we need to construct the referral or not?
         if (resp.type === 'query') {
           const fn = this.queryActions[resp.query];
-          resp = fn();
+          resp = fn.call(this);
         }
         const referral = ActionManager.load(this.creep, resp);
         this.actions.unshift(referral);
