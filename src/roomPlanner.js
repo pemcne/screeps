@@ -9,6 +9,9 @@ class RoomPlanner {
     if (!Memory.constructionSites) {
       Memory.constructionSites = [];
     }
+    if (!Memory.rooms) {
+      Memory.rooms = {};
+    }
   }
   generateRangeCoordinates(start, end) {
     return Array.from({ length: (end - start + 1) }, (v, k) => k + start);
@@ -132,59 +135,77 @@ class RoomPlanner {
           type: STRUCTURE_CONTAINER
         }
       }
-    } else if (memTarget.container === null && memTarget._pos !== null) {
-      // Construction in progress, check on it
-      const buildPos = memTarget._pos;
-      const site = _.find(Memory.constructionSites, (s) => {
-        return s.x === buildPos.x && s.y === buildPos.y && s.type === buildPos.type
-      });
-      if (!site) {
-        const pos = new RoomPosition(buildPos.x, buildPos.y, room.name);
-        const building = this.findAt(room, pos, buildPos.type);
-        if (building) {
-          memTarget.container = building.id;
-        }
-      }
     } else if (memTarget.container) {
       // Just check if it's valid
       if (!(Game.getObjectById(memTarget.container))) {
         memTarget.container = null;
+        // Since the container is dead, need to build another one
+        return this.buildContainer(target, room, range, memTarget, defaultParams);
       }
     }
     return memTarget
   }
+
+  updateConstructionSites() {
+    const updateSites = _.filter(Memory.constructionSites, (s) => s.id === null);
+    updateSites.forEach((site) => {
+      const construction = _.find(Game.constructionSites, (s) => {
+        return s.pos.x === site.x && s.pos.y === site.y;
+      });
+      let replacement = site;
+      replacement.id = construction.id;
+      const index = _.indexOf(Memory.constructionSites, site);
+      Memory.constructionSites.splice(index, 1, replacement);
+    });
+  }
+
   scan() {
+    // See if there's construction sites to update
+    this.updateConstructionSites();
+
     for (const roomName in Game.rooms) {
-      const room = Game.rooms[roomName];
-      const controller = room.controller;
-      const controllerRCL = controller.my ? controller.level : null;
-      const terrain = room.getTerrain();
-      const sources = room.find(FIND_SOURCES);
-      for (const source of sources) {
-        let memSource = Memory.sources[source.id];
-        const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
-        const params = {
-          freeSpaces: freeSpaces.length,
-          harvesters: [],
-          room: roomName,
-          container: null,
-          _pos: null
-        };
-        memSource = this.buildContainer(source, room, 1, memSource, params);
-        // Store back into memory
-        Memory.sources[source.id] = memSource;
-      }
-      if (controller.my) {
-        let memController = Memory.controllers[controller.id];
-        const params = {
-          upgraders: [],
-          room: roomName,
-          container: null,
-          _pos: null
+      let scanned = null;
+      if (!(roomName in Memory.rooms)) {
+        const save = {
+          scanned: Game.time
         }
-        memController = this.buildContainer(controller, room, 3, memController, params);
-        // Store back into memory
-        Memory.controllers[controller.id] = memController;
+        Memory.rooms[roomName] = save;
+      } else {
+        scanned = Memory.rooms[roomName].scanned;
+      }
+      if (scanned === null || (scanned + 100 < Game.time)) {
+        const room = Game.rooms[roomName];
+        const controller = room.controller;
+        const controllerRCL = controller.my ? controller.level : null;
+        const terrain = room.getTerrain();
+        const sources = room.find(FIND_SOURCES);
+        for (const source of sources) {
+          let memSource = Memory.sources[source.id];
+          const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
+          const params = {
+            freeSpaces: freeSpaces.length,
+            harvesters: [],
+            room: roomName,
+            container: null,
+            _pos: null
+          };
+          memSource = this.buildContainer(source, room, 1, memSource, params);
+          // Store back into memory
+          Memory.sources[source.id] = memSource;
+        }
+        if (controller.my) {
+          let memController = Memory.controllers[controller.id];
+          const params = {
+            upgraders: [],
+            room: roomName,
+            container: null,
+            _pos: null
+          }
+          memController = this.buildContainer(controller, room, 3, memController, params);
+          // Store back into memory
+          Memory.controllers[controller.id] = memController;
+        }
+        Memory.rooms[roomName].scanned = Game.time;
       }
     }
   }
