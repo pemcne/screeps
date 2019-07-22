@@ -12,6 +12,9 @@ export class Worker extends BaseCreep {
     }];
   }
   get available() {
+    if (!this.creep.memory.available) {
+      this.creep.memory.available = true;
+    }
     return this.creep.memory.available;
   }
   set available(avail) {

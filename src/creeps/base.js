@@ -4,6 +4,7 @@ class BaseCreep {
   constructor(creep) {
     this.creep = creep;
     this.actions = this.loadActions();
+    this.role = this.creep.memory.role;
     this.queryActions = {
       'getEnergy': this.findEnergy
     }
