@@ -1,4 +1,4 @@
-import ActionManager from '../actions/manager';
+import ActionManager from '../managers/action';
 
 class BaseCreep {
   constructor(creep) {

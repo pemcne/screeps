@@ -1,4 +1,4 @@
-class RoomPlanner {
+class RoomManager {
   constructor() {
     if (!Memory.sources) {
       Memory.sources = {};
@@ -211,4 +211,4 @@ class RoomPlanner {
   }
 }
 
-export default new RoomPlanner();
+export default new RoomManager();

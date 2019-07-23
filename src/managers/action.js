@@ -1,7 +1,7 @@
-import Harvest from "./harvest";
-import Move from "./move";
-import Transfer from './transfer';
-import Upgrade from "./upgrade";
+import Harvest from "../actions/harvest";
+import Move from "../actions/move";
+import Transfer from '../actions/transfer';
+import Upgrade from "../actions/upgrade";
 
 class ActionManager {
   constructor() {

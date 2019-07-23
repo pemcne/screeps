@@ -1,5 +1,5 @@
 import { BaseCreep } from '../base';
-import ActionManager from '../../actions/manager';
+import ActionManager from '../../managers/action';
 
 export class Harvester extends BaseCreep {
   static getInitialActions() {

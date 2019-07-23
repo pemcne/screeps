@@ -1,6 +1,6 @@
-import { RoleMap, RolePriority } from './rolemap';
+import { RoleMap, RolePriority } from '../creeps/rolemap';
 
-class CreepController {
+class CreepManager {
   clean() {
     for (var name in Memory.creeps) {
       if (!Game.creeps[name]) {
@@ -105,4 +105,4 @@ class CreepController {
   }
 }
 
-export default new CreepController();
+export default new CreepManager();
