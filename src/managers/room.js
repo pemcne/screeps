@@ -1,17 +1,33 @@
 class RoomManager {
-  constructor() {
-    if (!Memory.sources) {
-      Memory.sources = {};
+  constructor(base, room) {
+    this.base = base;
+    this.room = room;
+    this.name = room.name;
+    if (!(room.name in Memory.rooms)) {
+      Memory.rooms[room.name] = {
+        sources: {},
+        constructionSites: {},
+        scanned: null
+      }
     }
-    if (!Memory.controllers) {
-      Memory.controllers = {};
-    }
-    if (!Memory.constructionSites) {
-      Memory.constructionSites = [];
-    }
-    if (!Memory.rooms) {
-      Memory.rooms = {};
-    }
+  }
+  get sources() {
+    return Memory.rooms[this.name].sources;
+  }
+  set sources(id, source) {
+    Memory.rooms[this.name].sources[id] = source;
+  }
+  get constructionSites() {
+    return Memory.rooms[this.name].constructionSites;
+  }
+  set constructionSites(sites) {
+    Memory.rooms[this.name].constructionSites = sites;
+  }
+  get scanned() {
+    return Memory.rooms[this.name].scanned;
+  }
+  set scanned(time) {
+    Memory.rooms[this.name].scanned = time;
   }
   generateRangeCoordinates(start, end) {
     return Array.from({ length: (end - start + 1) }, (v, k) => k + start);
@@ -162,53 +178,41 @@ class RoomManager {
   scan() {
     // See if there's construction sites to update
     this.updateConstructionSites();
-
-    for (const roomName in Game.rooms) {
-      let scanned = null;
-      if (!(roomName in Memory.rooms)) {
-        const save = {
-          scanned: Game.time
-        }
-        Memory.rooms[roomName] = save;
-      } else {
-        scanned = Memory.rooms[roomName].scanned;
+    const room = this.room;
+    if (this.scanned === null || (this.scanned + 300 < Game.time)) {
+      const controller = room.controller;
+      const controllerRCL = controller.my ? controller.level : null;
+      const terrain = room.getTerrain();
+      const sources = room.find(FIND_SOURCES);
+      for (const source of sources) {
+        let memSource = Memory.sources[source.id];
+        const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
+        const params = {
+          freeSpaces: freeSpaces.length,
+          harvesters: [],
+          room: this.name,
+          container: null,
+          _pos: null
+        };
+        memSource = this.buildContainer(source, room, 1, memSource, params);
+        // Store back into memory
+        this.sources(source.id, memSource);
       }
-      if (scanned === null || (scanned + 100 < Game.time)) {
-        const room = Game.rooms[roomName];
-        const controller = room.controller;
-        const controllerRCL = controller.my ? controller.level : null;
-        const terrain = room.getTerrain();
-        const sources = room.find(FIND_SOURCES);
-        for (const source of sources) {
-          let memSource = Memory.sources[source.id];
-          const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
-          const params = {
-            freeSpaces: freeSpaces.length,
-            harvesters: [],
-            room: roomName,
-            container: null,
-            _pos: null
-          };
-          memSource = this.buildContainer(source, room, 1, memSource, params);
-          // Store back into memory
-          Memory.sources[source.id] = memSource;
+      if (controller.my) {
+        let memController = Memory.controllers[controller.id];
+        const params = {
+          upgraders: [],
+          room: this.name,
+          container: null,
+          _pos: null
         }
-        if (controller.my) {
-          let memController = Memory.controllers[controller.id];
-          const params = {
-            upgraders: [],
-            room: roomName,
-            container: null,
-            _pos: null
-          }
-          memController = this.buildContainer(controller, room, 3, memController, params);
-          // Store back into memory
-          Memory.controllers[controller.id] = memController;
-        }
-        Memory.rooms[roomName].scanned = Game.time;
+        memController = this.buildContainer(controller, room, 3, memController, params);
+        // Store back into memory
+        Memory.controllers[controller.id] = memController;
       }
+      Memory.rooms[this.name].scanned = Game.time;
     }
   }
 }
 
-export default new RoomManager();
+export default RoomManager;
