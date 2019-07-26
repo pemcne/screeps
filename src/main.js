@@ -3,12 +3,12 @@ import BaseManager from './managers/base';
 
 export const loop = () => {
   if (!Memory.bases) {
-    Memory.bases = {};
-    const base = new BaseManager('Base1');
-  } else {
-    for (name in Memory.bases) {
-      const base = new BaseManager(name);
-    }
+    Memory.bases = {}
+  }
+  for (name in Memory.bases) {
+    console.log(name);
+    const base = new BaseManager(name);
+    base.run();
   }
   // RoomPlanner.scan();
   // CreepController.run();

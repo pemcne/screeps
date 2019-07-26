@@ -1,11 +1,14 @@
+import RoomManager from './room';
+
 class BaseManager {
   constructor(name) {
     this.name = name;
-    if (name in Memory.bases) {
-      this.load();
-    } else {
+    const baseObj = Memory.bases[this.name];
+    if (Object.entries(baseObj).length === 0 && baseObj.constructor === Object) {
       // This is a new base so init
       this.init();
+    } else {
+      this.load();
     }
     this.save();
   }
@@ -28,6 +31,12 @@ class BaseManager {
     Memory.bases[this.name].rooms = rooms;
     Memory.bases[this.name].spawns = spawns;
     Memory.bases[this.name].creeps = creeps;
+  }
+  run() {
+    this.rooms.forEach((room) => {
+      const roomPlanner = new RoomManager(this, room);
+      roomPlanner.scan();
+    })
   }
 }
 

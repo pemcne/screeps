@@ -7,6 +7,7 @@ class RoomManager {
       Memory.rooms[room.name] = {
         sources: {},
         constructionSites: {},
+        _updateSites: [],
         scanned: null
       }
     }
@@ -14,8 +15,8 @@ class RoomManager {
   get sources() {
     return Memory.rooms[this.name].sources;
   }
-  set sources(id, source) {
-    Memory.rooms[this.name].sources[id] = source;
+  set sources(sources) {
+    Memory.rooms[this.name].sources = sources;
   }
   get constructionSites() {
     return Memory.rooms[this.name].constructionSites;
@@ -30,6 +31,7 @@ class RoomManager {
     Memory.rooms[this.name].scanned = time;
   }
   generateRangeCoordinates(start, end) {
+    // Given -5 and 5, this will generate an array of [-5, -4, ... 4, 5]
     return Array.from({ length: (end - start + 1) }, (v, k) => k + start);
   }
   scanEdge(xPerm, yPerm, sX, sY, room) {
@@ -130,7 +132,7 @@ class RoomManager {
           id: null,
           workers: []
         };
-        Memory.constructionSites.push(site);
+        Memory.rooms[this.name]._updateSites.push(site);
       }
       return resp;
     }
@@ -163,19 +165,29 @@ class RoomManager {
   }
 
   updateConstructionSites() {
-    const updateSites = _.filter(Memory.constructionSites, (s) => s.id === null);
-    updateSites.forEach((site) => {
+    const updateSites = Memory.rooms[this.name]._updateSites;
+    let allSites = this.constructionSites;
+    // We need to get ids for every site that doesn't have one
+    // Run through them all and if you do have an id, put it in memory
+    updateSites.forEach((site, i, obj) => {
       const construction = _.find(Game.constructionSites, (s) => {
         return s.pos.x === site.x && s.pos.y === site.y;
       });
-      let replacement = site;
-      replacement.id = construction.id;
-      const index = _.indexOf(Memory.constructionSites, site);
-      Memory.constructionSites.splice(index, 1, replacement);
+      if (construction !== null) {
+        let replacement = site;
+        replacement.id = construction.id;
+        allSites[replacement.id] = replacement;
+        // Remove the item out of the buffer
+        obj.splice(i, 1);
+      }
     });
+    // Update memory with processed array
+    this.constructionSites = allSites;
+    Memory.rooms[this.name]._updateSites = updateSites;
   }
 
   scan() {
+    console.log('scan', this.constructionSites, Memory.rooms[this.name]._updateSites)
     // See if there's construction sites to update
     this.updateConstructionSites();
     const room = this.room;
@@ -184,8 +196,9 @@ class RoomManager {
       const controllerRCL = controller.my ? controller.level : null;
       const terrain = room.getTerrain();
       const sources = room.find(FIND_SOURCES);
+      let sourceOutput = this.sources;
       for (const source of sources) {
-        let memSource = Memory.sources[source.id];
+        let memSource = sourceOutput[source.id];
         const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
         const params = {
           freeSpaces: freeSpaces.length,
@@ -195,22 +208,23 @@ class RoomManager {
           _pos: null
         };
         memSource = this.buildContainer(source, room, 1, memSource, params);
-        // Store back into memory
-        this.sources(source.id, memSource);
       }
-      if (controller.my) {
-        let memController = Memory.controllers[controller.id];
-        const params = {
-          upgraders: [],
-          room: this.name,
-          container: null,
-          _pos: null
-        }
-        memController = this.buildContainer(controller, room, 3, memController, params);
-        // Store back into memory
-        Memory.controllers[controller.id] = memController;
-      }
-      Memory.rooms[this.name].scanned = Game.time;
+      // Store back into memory
+      this.sources = sourceOutput;
+
+      // if (controller.my) {
+      //   let memController = Memory.controllers[controller.id];
+      //   const params = {
+      //     upgraders: [],
+      //     room: this.name,
+      //     container: null,
+      //     _pos: null
+      //   }
+      //   memController = this.buildContainer(controller, room, 3, memController, params);
+      //   // Store back into memory
+      //   Memory.controllers[controller.id] = memController;
+      // }
+      // Memory.rooms[this.name].scanned = Game.time;
     }
   }
 }
