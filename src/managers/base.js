@@ -1,7 +1,7 @@
 import RoomManager from './room';
 
 class BaseManager {
-  constructor(name) {
+  constructor(name, room) {
     this.name = name;
     const baseObj = Memory.bases[this.name];
     if (Object.entries(baseObj).length === 0 && baseObj.constructor === Object) {
@@ -12,7 +12,39 @@ class BaseManager {
     }
     this.save();
   }
-
+  get rooms() {
+    let rooms = Memory.bases[this.name].rooms;
+    if (!rooms) {
+      return Object.values(Game.rooms);
+    }
+    return rooms;
+  }
+  set rooms(rooms) {
+    const save = _.map(rooms, 'id');
+    Memory.bases[this.name].rooms = save;
+  }
+  get spawns() {
+    const spawns = Memory.bases[this.name].spawns;
+    if (!spawns) {
+      return this.rooms[0].find(FIND_MY_SPAWNS);
+    }
+    return spawns;
+  }
+  set spawns(spawns) {
+    const save = _.map(spawns, 'name');
+    Memory.bases[this.name].spawns = save;
+  }
+  get creeps() {
+    const creeps = Memory.bases[this.name].creeps;
+    if (!creeps) {
+      return [];
+    }
+    return creeps;
+  }
+  set creeps(creeps) {
+    const save = _.map(creeps, 'name');
+    Memory.bases[this.name].creeps = save;
+  }
   init() {
     this.rooms = Object.values(Game.rooms);
     this.spawns = this.rooms[0].find(FIND_MY_SPAWNS);
