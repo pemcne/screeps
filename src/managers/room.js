@@ -187,7 +187,6 @@ class RoomManager {
   }
 
   scan() {
-    console.log('scan', this.constructionSites, Memory.rooms[this.name]._updateSites)
     // See if there's construction sites to update
     this.updateConstructionSites();
     const room = this.room;
@@ -224,7 +223,7 @@ class RoomManager {
       //   // Store back into memory
       //   Memory.controllers[controller.id] = memController;
       // }
-      // Memory.rooms[this.name].scanned = Game.time;
+      Memory.rooms[this.name].scanned = Game.time;
     }
   }
 }

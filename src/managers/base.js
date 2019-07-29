@@ -1,4 +1,5 @@
 import RoomManager from './room';
+import CreepManager from './creep';
 
 class BaseManager {
   constructor(name) {
@@ -44,6 +45,8 @@ class BaseManager {
       const roomPlanner = new RoomManager(this, room);
       roomPlanner.scan();
     });
+    const creepManager = new CreepManager(this);
+    creepManager.run();
   }
 }
 
