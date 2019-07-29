@@ -119,11 +119,7 @@ class RoomManager {
         // Build succeeded
         const site = {
           x: pos.x,
-          y: pos.y,
-          type: structure,
-          room: room.name,
-          id: null,
-          workers: []
+          y: pos.y
         };
         Memory.rooms[this.name]._updateSites.push(site);
       }
@@ -167,6 +163,7 @@ class RoomManager {
         return s.pos.x === site.x && s.pos.y === site.y;
       });
       if (construction !== null) {
+        console.log(construction.workers);
         let replacement = site;
         replacement.id = construction.id;
         allSites.push(replacement);

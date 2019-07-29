@@ -17,22 +17,12 @@ class CreepManager {
   generateName(role) {
     return `${role}-${Game.time}`;
   }
-  getConstructionSites() {
-    let sites = [];
-    this.base.rooms.forEach((room) => {
-      const roomSites = Object.values(room.memory.constructionSites);
-      sites.push(roomSites);
-    });
-    return sites.flat();
-  }
   checkBuilds() {
     const workers = _.filter(this.creeps, creep => creep.role === 'worker');
     console.log('creep', this.creeps[0]);
     console.log('worker', workers[0]);
-    const constructionSites = this.getConstructionSites();
-    console.log(constructionSites[0]);
-    constructionSites.forEach((site) => {
-      const construction = Game.getObjectById(site.id);
+    const constructionSites = this.base.constructionSites;
+    constructionSites.forEach((construction) => {
       console.log('found construction', construction.id);
       if (site.numWorkers === undefined) {
         // Assume that each worker will contribute 1000
