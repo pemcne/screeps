@@ -40,13 +40,23 @@ class BaseManager {
     const save = _.map(creeps, 'id');
     Memory.bases[this.name].creeps = save;
   }
+  get constructionSites() {
+    const sites = Memory.bases[this.name].constructionSites;
+    if (!sites) {
+      return [];
+    }
+    return _.map(sites, (s) => Game.getObjectById(s));
+  }
+  set constructionSites(sites) {
+    Memory.bases[this.name].constructionSites = _.map(sites, 'id');
+  }
   run() {
     this.rooms.forEach((room) => {
       const roomPlanner = new RoomManager(this, room);
       roomPlanner.scan();
     });
-    const creepManager = new CreepManager(this);
-    creepManager.run();
+    // const creepManager = new CreepManager(this);
+    // creepManager.run();
   }
 }
 

@@ -6,7 +6,6 @@ class RoomManager {
     if (!(room.name in Memory.rooms)) {
       Memory.rooms[room.name] = {
         sources: {},
-        constructionSites: {},
         _updateSites: [],
         scanned: null
       }
@@ -17,12 +16,6 @@ class RoomManager {
   }
   set sources(sources) {
     Memory.rooms[this.name].sources = sources;
-  }
-  get constructionSites() {
-    return Memory.rooms[this.name].constructionSites;
-  }
-  set constructionSites(sites) {
-    Memory.rooms[this.name].constructionSites = sites;
   }
   get scanned() {
     return Memory.rooms[this.name].scanned;
@@ -166,7 +159,7 @@ class RoomManager {
 
   updateConstructionSites() {
     const updateSites = Memory.rooms[this.name]._updateSites;
-    let allSites = this.constructionSites;
+    let allSites = this.base.constructionSites;
     // We need to get ids for every site that doesn't have one
     // Run through them all and if you do have an id, put it in memory
     updateSites.forEach((site, i, obj) => {
@@ -176,13 +169,13 @@ class RoomManager {
       if (construction !== null) {
         let replacement = site;
         replacement.id = construction.id;
-        allSites[replacement.id] = replacement;
+        allSites.push(replacement);
         // Remove the item out of the buffer
         obj.splice(i, 1);
       }
     });
     // Update memory with processed array
-    this.constructionSites = allSites;
+    this.base.constructionSites = allSites;
     Memory.rooms[this.name]._updateSites = updateSites;
   }
 
