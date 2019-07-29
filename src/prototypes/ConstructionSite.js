@@ -1,1 +1,4 @@
-ConstructionSite.prototype.workers;
+Object.defineProperty(ConstructionSite.prototype, 'workers', {
+  value: [],
+  writable: true
+});
