@@ -51,10 +51,8 @@ class BaseManager {
     Memory.bases[this.name].constructionSites = _.map(sites, 'id');
   }
   run() {
-    this.rooms.forEach((room) => {
-      const roomPlanner = new RoomManager(this, room);
-      roomPlanner.scan();
-    });
+    const roomPlanner = new RoomManager(this);
+    roomPlanner.run();
     // const creepManager = new CreepManager(this);
     // creepManager.run();
   }

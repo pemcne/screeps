@@ -1,11 +1,17 @@
 Object.defineProperties(Room.prototype, {
   scanned: {
-    get: () => this.memory.scanned,
-    set: (data) => this.memory.scanned = data,
-    value: null
+    get: function() {
+      if (!this.memory.scanned) {
+        return null;
+      }
+      return this.memory.scanned;
+    },
+    set: function(data) {
+      this.memory.scanned = data
+    }
   },
   sources: {
-    get: () => {
+    get: function() {
       if (!this._sources) {
         if (!this.memory.sourceIds) {
           this.memory.sourceIds = this.find(FIND_SOURCES).map(source => source.id);
@@ -14,7 +20,7 @@ Object.defineProperties(Room.prototype, {
       }
       return this._sources;
     },
-    set: (data) => {
+    set: function(data) {
       this.memory.sources = data.map(source => source.id);
       this._sources = data;
     },

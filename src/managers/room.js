@@ -2,7 +2,10 @@ class RoomManager {
   constructor(base) {
     this.base = base;
     if (!Memory.scratch._updateSites) {
-      Memory.scratch._updateSites = {};
+      Memory.scratch._updateSites = [];
+    }
+    if (!Memory.scratch.containerCache) {
+      Memory.scratch.containerCache = {};
     }
   }
   generateRangeCoordinates(start, end) {
@@ -92,7 +95,7 @@ class RoomManager {
   buildComplete(siteId) {
     _.remove(Memory.constructionSites, (s) => s.id === siteId);
   }
-  build(room, pos, structure) {
+  build(room, pos, structure, reference) {
     // Returns the id of the construction site if successful
     // Returns null otherwise
     if (this.canBuild(room, structure, room.controller.level)) {
@@ -101,38 +104,23 @@ class RoomManager {
         // Build succeeded
         const site = {
           x: pos.x,
-          y: pos.y
+          y: pos.y,
+          reference: reference
         };
-        Memory.rooms[this.name]._updateSites.push(site);
+        Memory.scratch._updateSites.push(site);
       }
       return resp;
     }
     return null;
   }
-  buildContainer(target, room, range, memTarget, defaultParams) {
-    if (memTarget === undefined) {
-      memTarget = defaultParams;
-    }
-    if (target.container === null && memTarget._pos === null) {
-      // Build was unsuccessful last time
+  buildContainer(target, room, range) {
+    // See if this is the first time building a container
+    if (Memory.scratch.containerCache[target.id] === undefined) {
       const container = this.chooseContainer(room, target.pos, range);
-      const resp = this.build(room, container, STRUCTURE_CONTAINER);
-      if (!resp) {
-        memTarget._pos = {
-          x: container.x,
-          y: container.y,
-          type: STRUCTURE_CONTAINER
-        }
-      }
-    } else if (memTarget.container) {
-      // Just check if it's valid
-      if (!(Game.getObjectById(memTarget.container))) {
-        memTarget.container = null;
-        // Since the container is dead, need to build another one
-        return this.buildContainer(target, room, range, memTarget, defaultParams);
-      }
+      this.build(room, container, STRUCTURE_CONTAINER, target.id);
+      // Put null in here as a placeholder to know that we started
+      Memory.scratch.containerCache[target.id] = null;
     }
-    return memTarget
   }
 
   updateConstructionSites() {
@@ -150,6 +138,9 @@ class RoomManager {
         allSites.push(replacement);
         // Remove the item out of the buffer
         obj.splice(i, 1);
+        // Update the containerCache with the id so we know it's in progress
+        // TODO: implement a clean function to clean up containerCache
+        Memory.scratch.containerCache[site.reference] = construction.id
       }
     });
     // Update memory with processed array
@@ -174,21 +165,6 @@ class RoomManager {
           this.buildContainer(source, room, 1)
         }
       })
-      // let sourceOutput = room.sources;
-      // for (const source of sources) {
-      //   let memSource = sourceOutput[source.id];
-      //   const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
-      //   const params = {
-      //     freeSpaces: freeSpaces.length,
-      //     harvesters: [],
-      //     room: this.name,
-      //     container: null,
-      //     _pos: null
-      //   };
-      //   memSource = this.buildContainer(source, room, 1, memSource, params);
-      // }
-      // Store back into memory
-      this.sources = sourceOutput;
 
       // if (controller.my) {
       //   let memController = Memory.controllers[controller.id];
@@ -202,7 +178,7 @@ class RoomManager {
       //   // Store back into memory
       //   Memory.controllers[controller.id] = memController;
       // }
-      Memory.rooms[this.name].scanned = Game.time;
+      room.scanned = Game.time;
     }
   }
   run() {

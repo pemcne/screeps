@@ -1,6 +1,6 @@
 Object.defineProperties(ConstructionSite.prototype, {
   memory: {
-    get: () => {
+    get: function() {
       if (_.isUndefined(Memory.constructionSites)) {
         Memory.constructionSites = {};
       }
@@ -9,7 +9,7 @@ Object.defineProperties(ConstructionSite.prototype, {
       }
       return Memory.constructionSites[this.id];
     },
-    set: (data) => {
+    set: function(data) {
       if (_.isUndefined(Memory.constructionSites)) {
         Memory.constructionSites = {};
       }
@@ -18,15 +18,14 @@ Object.defineProperties(ConstructionSite.prototype, {
     configurable: true
   },
   workers: {
-    get: () => {
+    get: function() {
       if (this.memory.workers) {
         return _.map(this.memory.workers, (id) => Game.getObjectById(id));
       }
       return null
     },
-    set: (data) => {
+    set: function(data) {
       this.memory.constructionSites = _.map(data, 'id');
-    },
-    value: null
+    }
   }
 });

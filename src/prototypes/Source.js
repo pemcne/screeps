@@ -1,6 +1,6 @@
 Object.defineProperties(Source.prototype, {
   memory: {
-    get: () => {
+    get: function() {
       if (_.isUndefined(Memory.sources)) {
         Memory.sources = {};
       }
@@ -9,7 +9,7 @@ Object.defineProperties(Source.prototype, {
       }
       return Memory.sources[this.id];
     },
-    set: (data) => {
+    set: function(data) {
       if (_.isUndefined(Memory.sources)) {
         Memory.sources = {};
       }
@@ -18,20 +18,22 @@ Object.defineProperties(Source.prototype, {
     configurable: true
   },
   numFreeSpaces: {
-    get: () => this.memory.freeSpaces,
-    set: (data) => this.memory.freeSpaces = data,
-    value: null
+    get: function() {
+      return this.memory.freeSpaces
+    },
+    set: function(data) {
+      this.memory.freeSpaces = data
+    }
   },
   container: {
-    get: () => {
+    get: function() {
       if (this.memory.container) {
         return Game.getObjectById(this.memory.container);
       }
       return null;
     },
-    set: (data) => {
+    set: function(data) {
       this.memory.container = data.id;
-    },
-    value: null
+    }
   }
 });
