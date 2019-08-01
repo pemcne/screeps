@@ -17,7 +17,7 @@ Object.defineProperties(Source.prototype, {
     },
     configurable: true
   },
-  freeSpaces: {
+  numFreeSpaces: {
     get: () => this.memory.freeSpaces,
     set: (data) => this.memory.freeSpaces = data,
     value: null

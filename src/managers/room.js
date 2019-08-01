@@ -1,27 +1,9 @@
 class RoomManager {
-  constructor(base, room) {
+  constructor(base) {
     this.base = base;
-    this.room = room;
-    this.name = room.name;
-    if (!(room.name in Memory.rooms)) {
-      Memory.rooms[room.name] = {
-        sources: {},
-        _updateSites: [],
-        scanned: null
-      }
+    if (!Memory.scratch._updateSites) {
+      Memory.scratch._updateSites = {};
     }
-  }
-  get sources() {
-    return Memory.rooms[this.name].sources;
-  }
-  set sources(sources) {
-    Memory.rooms[this.name].sources = sources;
-  }
-  get scanned() {
-    return Memory.rooms[this.name].scanned;
-  }
-  set scanned(time) {
-    Memory.rooms[this.name].scanned = time;
   }
   generateRangeCoordinates(start, end) {
     // Given -5 and 5, this will generate an array of [-5, -4, ... 4, 5]
@@ -73,15 +55,15 @@ class RoomManager {
     new RoomVisual(room.name).circle(spot.x, spot.y, { opacity: 1, fill: '#ff0000' });
     return spot;
   }
-  findFreeSpaces(terrain, room, source, range = 1) {
+  findFreeSpaces(room, source, terrain, range = 1) {
     const pos = source.pos;
-    const adjacent = this.getAllAdjacent(pos, room, range);
+    const adjacent = this.getAllAdjacent(pos, room.name, range);
     let freeSpaces = [];
     for (const adj of adjacent) {
       const terrainType = terrain.get(adj.x, adj.y);
       if (terrainType !== TERRAIN_MASK_WALL) {
         freeSpaces.push(adj);
-        new RoomVisual(room).circle(adj.x, adj.y, { opacity: 1 });
+        new RoomVisual(room.name).circle(adj.x, adj.y, { opacity: 1 });
       }
     }
     return freeSpaces;
@@ -131,7 +113,7 @@ class RoomManager {
     if (memTarget === undefined) {
       memTarget = defaultParams;
     }
-    if (memTarget.container === null && memTarget._pos === null) {
+    if (target.container === null && memTarget._pos === null) {
       // Build was unsuccessful last time
       const container = this.chooseContainer(room, target.pos, range);
       const resp = this.build(room, container, STRUCTURE_CONTAINER);
@@ -154,7 +136,7 @@ class RoomManager {
   }
 
   updateConstructionSites() {
-    const updateSites = Memory.rooms[this.name]._updateSites;
+    const updateSites = Memory.scratch._updateSites;
     let allSites = this.base.constructionSites;
     // We need to get ids for every site that doesn't have one
     // Run through them all and if you do have an id, put it in memory
@@ -163,7 +145,6 @@ class RoomManager {
         return s.pos.x === site.x && s.pos.y === site.y;
       });
       if (construction !== null) {
-        console.log(construction.workers);
         let replacement = site;
         replacement.id = construction.id;
         allSites.push(replacement);
@@ -173,31 +154,39 @@ class RoomManager {
     });
     // Update memory with processed array
     this.base.constructionSites = allSites;
-    Memory.rooms[this.name]._updateSites = updateSites;
+    Memory.scratch._updateSites = updateSites;
   }
 
-  scan() {
+  scan(room) {
     // See if there's construction sites to update
     this.updateConstructionSites();
-    const room = this.room;
-    if (this.scanned === null || (this.scanned + 300 < Game.time)) {
+    if (room.scanned === null || (room.scanned + 300 < Game.time)) {
       const controller = room.controller;
       const controllerRCL = controller.my ? controller.level : null;
       const terrain = room.getTerrain();
-      const sources = room.find(FIND_SOURCES);
-      let sourceOutput = this.sources;
-      for (const source of sources) {
-        let memSource = sourceOutput[source.id];
-        const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
-        const params = {
-          freeSpaces: freeSpaces.length,
-          harvesters: [],
-          room: this.name,
-          container: null,
-          _pos: null
-        };
-        memSource = this.buildContainer(source, room, 1, memSource, params);
-      }
+      const sources = room.sources;
+      sources.forEach((source) => {
+        if (!source.numFreeSpaces) {
+          const freeSpaces = this.findFreeSpaces(room, source, terrain, 1);
+          source.numFreeSpaces = freeSpaces.length;
+        }
+        if (!source.container) {
+          this.buildContainer(source, room, 1)
+        }
+      })
+      // let sourceOutput = room.sources;
+      // for (const source of sources) {
+      //   let memSource = sourceOutput[source.id];
+      //   const freeSpaces = this.findFreeSpaces(terrain, room.name, source, 1);
+      //   const params = {
+      //     freeSpaces: freeSpaces.length,
+      //     harvesters: [],
+      //     room: this.name,
+      //     container: null,
+      //     _pos: null
+      //   };
+      //   memSource = this.buildContainer(source, room, 1, memSource, params);
+      // }
       // Store back into memory
       this.sources = sourceOutput;
 
@@ -215,6 +204,12 @@ class RoomManager {
       // }
       Memory.rooms[this.name].scanned = Game.time;
     }
+  }
+  run() {
+    const rooms = this.base.rooms;
+    rooms.forEach((room) => {
+      this.scan(room);
+    });
   }
 }
 
