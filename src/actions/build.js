@@ -14,7 +14,7 @@ export default class Build extends Action {
         query: 'getEnergy'
       }
       return referral;
-    } else if (!this.creep.pos.isRangeTo(this.target, 3)) {
+    } else if (!this.creep.pos.inRangeTo(this.target, 3)) {
       const referral = {
         type: 'move',
         data: {

@@ -17,6 +17,8 @@ class BaseCreep {
   addAction(action) {
     const a = ActionManager.load(this.creep, action);
     this.actions.unshift(a);
+    // Push to memory in case run isn't being called because it is spawning
+    this.saveActions();
   }
 
   loadActions() {
@@ -31,6 +33,10 @@ class BaseCreep {
       allActions.push(action);
     });
     return allActions;
+  }
+
+  saveActions() {
+    this.creep.memory.actions = _.map(this.actions, 'rawData');
   }
 
   actionComplete(action) {
@@ -71,7 +77,7 @@ class BaseCreep {
       }
     }
     // Store the state in memory
-    this.creep.memory.actions = this.actions;
+    this.saveActions();
   }
 
 

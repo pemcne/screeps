@@ -19,22 +19,16 @@ class CreepManager {
   }
   checkBuilds() {
     const workers = _.filter(this.creeps, creep => creep.role === 'worker');
-    console.log('creep', this.creeps[0]);
-    console.log('worker', workers[0]);
     const constructionSites = this.base.constructionSites;
     constructionSites.forEach((site) => {
-      console.log('found construction', site.id);
       // TODO pull in the actual construction site and use the prototype
       const numWorkers = site.numWorkers;
-      console.log('workers needed', numWorkers, site.workers.length);
       if (site.workers.length < numWorkers) {
         const diff = numWorkers - site.workers.length;
         const freeWorkers = _.filter(workers, (worker) => worker.available);
-        console.log('found workers to use', freeWorkers);
         if (freeWorkers.length !== 0) {
           const builders = site.pos.findClosestNByPath(freeWorkers, diff);
           builders.forEach((b) => {
-            console.log(b);
             const action = {
               type: 'build',
               data: {
@@ -51,7 +45,6 @@ class CreepManager {
   loadCreeps(creeps) {
     this.creeps = [];
     creeps.forEach((creep) => {
-      console.log('loading', creep);
       const role = creep.memory.role;
       const roleConfig = RoleMap[role];
       this.creeps.push(new roleConfig.cls(creep));
@@ -63,11 +56,10 @@ class CreepManager {
       this.clean();
     }
 
-
     const spawn = Game.spawns.Spawn1;
     const roomName = Object.keys(Game.rooms)[0];
     const room = Game.rooms[roomName];
-    let spawning = false;
+    let spawning = spawn.spawning;
     // Assign workers to construction sites
     this.checkBuilds();
     // Run through all creeps
@@ -80,11 +72,10 @@ class CreepManager {
         spawning = true;
       }
       creeps.forEach(creep => {
-        if (creep.spawning) {
+        if (creep.creep.spawning) {
           // Skip since we are spawning
           return;
         }
-        console.log('creep test', creep);
         if (creep.actions.length === 0) {
           creep.creep.memory.actions = classObj.getInitialActions(room);
           creep.loadActions();
@@ -99,7 +90,9 @@ class CreepManager {
       role: role
     };
     const resp = spawn.spawnCreep(body, name, { memory: memory });
-    this.base.addCreep(name);
+    if (resp === OK) {
+      this.base.addCreep(name);
+    }
     return resp;
   }
 }

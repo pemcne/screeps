@@ -1,8 +1,9 @@
 export default class Action {
-  constructor(creep, type, data, repeat = false) {
+  constructor(creep, data, repeat = false) {
     this.creep = creep;
-    this.type = type;
-    this.data = data;
+    this.rawData = data;
+    this.type = data.type;
+    this.data = data.data;
     this.repeat = repeat;
     this.init();
   }

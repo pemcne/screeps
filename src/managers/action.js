@@ -24,7 +24,7 @@ class ActionManager {
     }
     const repeat = data.repeat ? data.repeat : false;
     // console.log('Making action', data.type, repeat);
-    const actionObj = new actionClass(creep, data.type, data.data, repeat);
+    const actionObj = new actionClass(creep, data, repeat);
     return actionObj;
   }
 }
