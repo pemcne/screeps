@@ -22,13 +22,9 @@ class CreepManager {
     console.log('creep', this.creeps[0]);
     console.log('worker', workers[0]);
     const constructionSites = this.base.constructionSites;
-    constructionSites.forEach((construction) => {
-      console.log('found construction', construction.id);
+    constructionSites.forEach((site) => {
+      console.log('found construction', site.id);
       // TODO pull in the actual construction site and use the prototype
-      if (site.numWorkers === undefined) {
-        // Assume that each worker will contribute 1000
-        site.numWorkers = construction.progressTotal / 2500;
-      }
       const numWorkers = site.numWorkers;
       console.log('workers needed', numWorkers, site.workers.length);
       if (site.workers.length < numWorkers) {
@@ -36,9 +32,9 @@ class CreepManager {
         const freeWorkers = _.filter(workers, (worker) => worker.available);
         console.log('found workers to use', freeWorkers);
         if (freeWorkers.length !== 0) {
-          const builders = construction.pos.findClosestNByPath(freeWorkers, diff);
-          console.log('inside', site);
+          const builders = site.pos.findClosestNByPath(freeWorkers, diff);
           builders.forEach((b) => {
+            console.log(b);
             const action = {
               type: 'build',
               data: {
@@ -54,11 +50,12 @@ class CreepManager {
   }
   loadCreeps(creeps) {
     this.creeps = [];
-    for (creep of creeps) {
+    creeps.forEach((creep) => {
+      console.log('loading', creep);
       const role = creep.memory.role;
       const roleConfig = RoleMap[role];
       this.creeps.push(new roleConfig.cls(creep));
-    }
+    });
   }
   run() {
     // Need to clean
@@ -87,18 +84,22 @@ class CreepManager {
           // Skip since we are spawning
           return;
         }
-        const c = new classObj(creep);
-        if (c.actions.length === 0) {
-          creep.memory.actions = classObj.getInitialActions(room);
-          c.loadActions();
+        console.log('creep test', creep);
+        if (creep.actions.length === 0) {
+          creep.creep.memory.actions = classObj.getInitialActions(room);
+          creep.loadActions();
         }
-        c.run();
+        creep.run();
       })
     }
   }
   spawn(spawn, role, body) {
     const name = this.generateName(role);
-    const resp = spawn.createCreep(body, name, { role: role });
+    const memory = {
+      role: role
+    };
+    const resp = spawn.spawnCreep(body, name, { memory: memory });
+    this.base.addCreep(name);
     return resp;
   }
 }

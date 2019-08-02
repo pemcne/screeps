@@ -2,6 +2,7 @@ import Harvest from "../actions/harvest";
 import Move from "../actions/move";
 import Transfer from '../actions/transfer';
 import Upgrade from "../actions/upgrade";
+import Build from "../actions/build";
 
 class ActionManager {
   constructor() {
@@ -9,7 +10,8 @@ class ActionManager {
       harvest: Harvest,
       move: Move,
       transfer: Transfer,
-      upgrade: Upgrade
+      upgrade: Upgrade,
+      build: Build
     };
   }
   load(creep, data) {

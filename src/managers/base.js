@@ -4,6 +4,7 @@ import CreepManager from './creep';
 class BaseManager {
   constructor(name) {
     this.name = name;
+    this.init();
   }
   static newBase(name, room) {
     Memory.bases[name] = {
@@ -49,6 +50,15 @@ class BaseManager {
   }
   set constructionSites(sites) {
     Memory.bases[this.name].constructionSites = _.map(sites, 'id');
+  }
+  init() {
+    if (!Memory.bases[this.name].creeps) {
+      Memory.bases[this.name].creeps = [];
+    }
+  }
+  addCreep(creep) {
+    // This will take a name of a creep and just push it into memory
+    Memory.bases[this.name].creeps.push(creep);
   }
   run() {
     const roomPlanner = new RoomManager(this);
