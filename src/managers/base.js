@@ -53,8 +53,8 @@ class BaseManager {
   run() {
     const roomPlanner = new RoomManager(this);
     roomPlanner.run();
-    // const creepManager = new CreepManager(this);
-    // creepManager.run();
+    const creepManager = new CreepManager(this);
+    creepManager.run();
   }
 }
 

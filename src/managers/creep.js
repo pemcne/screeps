@@ -24,6 +24,7 @@ class CreepManager {
     const constructionSites = this.base.constructionSites;
     constructionSites.forEach((construction) => {
       console.log('found construction', construction.id);
+      // TODO pull in the actual construction site and use the prototype
       if (site.numWorkers === undefined) {
         // Assume that each worker will contribute 1000
         site.numWorkers = construction.progressTotal / 2500;
@@ -36,6 +37,7 @@ class CreepManager {
         console.log('found workers to use', freeWorkers);
         if (freeWorkers.length !== 0) {
           const builders = construction.pos.findClosestNByPath(freeWorkers, diff);
+          console.log('inside', site);
           builders.forEach((b) => {
             const action = {
               type: 'build',
