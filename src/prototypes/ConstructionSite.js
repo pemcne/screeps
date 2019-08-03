@@ -32,7 +32,7 @@ Object.defineProperties(ConstructionSite.prototype, {
     get: function() {
       if (!this.memory.numWorkers) {
         // Assume each worker will do 2500
-        this.memory.numWorkers = this.progressTotal / 2500;
+        this.memory.numWorkers = Math.ceil(this.progressTotal / 2500);
       }
       return this.memory.numWorkers;
     }

@@ -21,7 +21,10 @@ class CreepManager {
     const workers = _.filter(this.creeps, creep => creep.role === 'worker');
     const constructionSites = this.base.constructionSites;
     constructionSites.forEach((site) => {
-      // TODO pull in the actual construction site and use the prototype
+      if (site === null) {
+        // We just completed it so skip it here for now
+        return
+      }
       const numWorkers = site.numWorkers;
       if (site.workers.length < numWorkers) {
         const diff = numWorkers - site.workers.length;

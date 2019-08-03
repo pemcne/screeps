@@ -8,7 +8,7 @@ export default class Build extends Action {
     return this.target === null
   }
   run() {
-    if (this.creep.carry.RESOURCE_ENERGY === 0) {
+    if (this.creep.carry[RESOURCE_ENERGY] === 0) {
       const referral = {
         type: 'query',
         query: 'getEnergy'
