@@ -1,8 +1,9 @@
 import ActionManager from '../managers/action';
 
 class BaseCreep {
-  constructor(creep) {
+  constructor(creep, manager) {
     this.creep = creep;
+    this.manager = manager;
     this.actions = this.loadActions();
     this.role = this.creep.memory.role;
     this.queryActions = {
@@ -40,9 +41,9 @@ class BaseCreep {
   }
 
   actionComplete(action) {
-    return null;
+    // Placeholder so individual creeps can override it
+    this.manager.actionComplete(action);
   }
-
   run() {
     console.log(this.actions);
     if (this.actions.length === 0) {
@@ -79,11 +80,6 @@ class BaseCreep {
     // Store the state in memory
     this.saveActions();
   }
-
-
-  findClosestConstructionSite() {
-    return this.creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
-  }
   findClosestSource() {
     return this.creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
   }
@@ -118,6 +114,8 @@ class BaseCreep {
     }
     return action;
   }
+
+
   build(target) {
     const resp = this.creep.build(target);
     if (resp === ERR_NOT_IN_RANGE) {

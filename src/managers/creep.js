@@ -17,6 +17,21 @@ class CreepManager {
   generateName(role) {
     return `${role}-${Game.time}`;
   }
+  actionComplete(action) {
+    if (action.type === 'build') {
+      const site = action.data.target;
+      delete Memory.constructionSites[site];
+      for (const [key, value] of Object.entries(Memory.scratch.containerCache)) {
+        if (value === site) {
+          const target = Game.getObjectById(key);
+          target.container = site;
+          delete Memory.scratch.containerCache[key];
+          break;
+        }
+      }
+      delete Memory.constructionSites[site];
+    }
+  }
   checkBuilds() {
     const workers = _.filter(this.creeps, creep => creep.role === 'worker');
     const constructionSites = this.base.constructionSites;
@@ -27,7 +42,8 @@ class CreepManager {
       }
       const numWorkers = site.numWorkers;
       if (site.workers.length < numWorkers) {
-        const diff = numWorkers - site.workers.length;
+        let siteWorkers = site.workers;
+        const diff = numWorkers - siteWorkers.length;
         const freeWorkers = _.filter(workers, (worker) => worker.available);
         if (freeWorkers.length !== 0) {
           const builders = site.pos.findClosestNByPath(freeWorkers, diff);
@@ -40,6 +56,9 @@ class CreepManager {
             }
             b.addAction(action);
             b.available = false;
+            siteWorkers.push(b.creep);
+            // Save the workers for later
+            site.workers = siteWorkers;
           });
         }
       }
@@ -48,9 +67,13 @@ class CreepManager {
   loadCreeps(creeps) {
     this.creeps = [];
     creeps.forEach((creep) => {
+      // Just in case the creep doesn't exist...
+      if (!creep) {
+        return;
+      }
       const role = creep.memory.role;
       const roleConfig = RoleMap[role];
-      this.creeps.push(new roleConfig.cls(creep));
+      this.creeps.push(new roleConfig.cls(creep, this));
     });
   }
   run() {
@@ -80,7 +103,7 @@ class CreepManager {
           return;
         }
         if (creep.actions.length === 0) {
-          creep.creep.memory.actions = classObj.getInitialActions(room);
+          creep.creep.memory.actions = roleConfig.cls.getInitialActions(room);
           creep.loadActions();
         }
         creep.run();

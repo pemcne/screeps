@@ -38,7 +38,7 @@ class BaseManager {
     return _.map(creeps, (c) => Game.creeps[c]);
   }
   set creeps(creeps) {
-    const save = _.map(creeps, 'id');
+    const save = _.map(creeps, 'name');
     Memory.bases[this.name].creeps = save;
   }
   get constructionSites() {
@@ -49,7 +49,15 @@ class BaseManager {
     return _.map(sites, (s) => Game.getObjectById(s));
   }
   set constructionSites(sites) {
-    Memory.bases[this.name].constructionSites = _.map(sites, 'id');
+    // TODO: optimize this, every loop we are cycling through all sites
+    let save = sites;
+    save.forEach((i, index, obj) => {
+      if (i === null) {
+        console.log('removing from sites', index);
+        obj.splice(index, 1);
+      }
+    });
+    Memory.bases[this.name].constructionSites = _.map(save, 'id');
   }
   init() {
     if (!Memory.bases[this.name].creeps) {

@@ -33,7 +33,11 @@ Object.defineProperties(Source.prototype, {
       return null;
     },
     set: function(data) {
-      this.memory.container = data.id;
+      if (typeof(data) === 'string') {
+        this.memory.container = data;
+      } else {
+        this.memory.container = data.id;
+      }
     }
   }
 });

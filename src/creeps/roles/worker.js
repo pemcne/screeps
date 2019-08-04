@@ -18,7 +18,12 @@ export class Worker extends BaseCreep {
     return this.creep.memory.available;
   }
   set available(avail) {
-    console.log('WORKER SETTER', avail);
     this.creep.memory.available = avail;
+  }
+  actionComplete(action) {
+    this.manager.actionComplete(action);
+    if (action.type == 'build') {
+      this.available = true;
+    }
   }
 }

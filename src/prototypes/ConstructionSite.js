@@ -25,7 +25,7 @@ Object.defineProperties(ConstructionSite.prototype, {
       return []
     },
     set: function(data) {
-      this.memory.constructionSites = _.map(data, 'id');
+      this.memory.workers = _.map(data, 'name');
     }
   },
   numWorkers: {
