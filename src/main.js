@@ -5,6 +5,9 @@ const init = () => {
   if (!Memory.scratch) {
     Memory.scratch = {};
   }
+  if (!Memory.constructionSites) {
+    Memory.constructionSites = {};
+  }
 }
 
 export const loop = () => {

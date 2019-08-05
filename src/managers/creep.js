@@ -7,10 +7,17 @@ class CreepManager {
     this.loadCreeps(base.creeps);
   }
   clean() {
-    for (var name in Memory.creeps) {
+    for (const creep in this.creeps) {
+      const name = creep.name;
       if (!Game.creeps[name]) {
+        // Need to delete
+        for (const [id, site] of Object.entries(Memory.constructionSites)) {
+          if (site.workers && site.workers.includes(name)) {
+            Memory.constructionSites[id].workers = _.without(site.workers, name);
+          }
+        }
+        Memory.bases[this.base.name].creeps = _.without(Memory.bases[this.base.name].creeps, name);
         delete Memory.creeps[name];
-        console.log('Clearing non-existing creep memory:', name);
       }
     }
   }
@@ -78,7 +85,7 @@ class CreepManager {
   }
   run() {
     // Need to clean
-    if (Game.time % 100 === 0) {
+    if (Game.time % 1 === 0) {
       this.clean();
     }
 
@@ -107,7 +114,7 @@ class CreepManager {
           creep.loadActions();
         }
         creep.run();
-      })
+      });
     }
   }
   spawn(spawn, role, body) {

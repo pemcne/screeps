@@ -3,6 +3,7 @@ import ActionManager from '../managers/action';
 class BaseCreep {
   constructor(creep, manager) {
     this.creep = creep;
+    this.name = creep.name;
     this.manager = manager;
     this.actions = this.loadActions();
     this.role = this.creep.memory.role;
