@@ -21,7 +21,8 @@ export default class Build extends Action {
           target: {
             x: this.target.pos.x,
             y: this.target.pos.y
-          }
+          },
+          range: 3
         }
       };
       return referral;
