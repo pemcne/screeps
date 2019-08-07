@@ -71,8 +71,11 @@ class BaseCreep {
         // Need to see if we need to construct the referral or not?
         if (resp.type === 'query') {
           const fn = this.queryActions[resp.query];
-          resp = fn.call(this);
+          const newAction = fn.call(this);
+          // This will maintain any preset keys like repeat and count
+          resp = _.merge(resp, newAction);
         }
+
         const referral = ActionManager.load(this.creep, resp);
         this.actions.unshift(referral);
         this.run();
