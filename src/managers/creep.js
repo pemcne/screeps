@@ -40,8 +40,10 @@ class CreepManager {
       delete Memory.constructionSites[site];
     }
   }
+  assignWorkers() {
+    this.checkBuilds();
+  }
   checkBuilds() {
-    const workers = _.filter(this.creeps, creep => creep.role === 'worker');
     const constructionSites = this.base.constructionSites;
     constructionSites.forEach((site) => {
       if (site === null) {
@@ -52,28 +54,20 @@ class CreepManager {
       if (site.workers.length < numWorkers) {
         let siteWorkers = site.workers;
         const diff = numWorkers - siteWorkers.length;
-        const freeWorkers = _.filter(workers, (worker) => worker.available);
-        if (freeWorkers.length !== 0) {
-          const builders = site.pos.findClosestNByPath(freeWorkers, diff);
+        if (this.freeWorkers.length !== 0) {
+          const builders = site.pos.findClosestNByPath(this.freeWorkers, diff);
           builders.forEach((b) => {
-            // const action = {
-            //   type: 'build',
-            //   data: {
-            //     target: site.id
-            //   }
-            // }
             const action = {
-              type: 'upgrade',
+              type: 'build',
               data: {
-                target: '6357c627ad1c88d28ad8989a',
-                count: 3
+                target: site.id
               }
             }
-            b.addAction(action);
-            b.available = false;
+            b.assignTask(action);
             siteWorkers.push(b.creep);
             // Save the workers for later
             site.workers = siteWorkers;
+            _.remove(this.freeWorkers, c => c.name === b.name);
           });
         }
       }
@@ -81,6 +75,8 @@ class CreepManager {
   }
   loadCreeps(creeps) {
     this.creeps = [];
+    this.creepRoles = {};
+    this.freeWorkers = [];
     creeps.forEach((creep) => {
       // Just in case the creep doesn't exist...
       if (!creep) {
@@ -89,7 +85,15 @@ class CreepManager {
       }
       const role = creep.memory.role;
       const roleConfig = RoleMap[role];
-      this.creeps.push(new roleConfig.cls(creep, this));
+      const creepObject = new roleConfig.cls(creep, this);
+      this.creeps.push(creepObject);
+      if (!(role in this.creepRoles)) {
+        this.creepRoles[role] = [];
+      }
+      this.creepRoles[role].push(creepObject)
+      if (role === 'worker' && creepObject.available) {
+        this.freeWorkers.push(creepObject);
+      }
     });
   }
   run() {
@@ -98,7 +102,7 @@ class CreepManager {
     const room = Game.rooms[roomName];
     let spawning = spawn.spawning;
     // Assign workers to construction sites
-    this.checkBuilds();
+    this.assignWorkers();
     // Run through all creeps
     for (const role of RolePriority) {
       const creeps = _.filter(this.creeps, creep => creep.role === role);

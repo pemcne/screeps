@@ -26,4 +26,8 @@ export class Worker extends BaseCreep {
       this.available = true;
     }
   }
+  assignTask(action) {
+    this.addAction(action);
+    this.available = false;
+  }
 }
