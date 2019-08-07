@@ -5,6 +5,9 @@ export default class Build extends Action {
     this.target = Game.getObjectById(this.data.target);
   }
   isComplete() {
+    if (super.countComplete()) {
+      return true;
+    }
     return this.target === null
   }
   run() {
@@ -28,5 +31,6 @@ export default class Build extends Action {
       return referral;
     }
     this.creep.build(this.target);
+    super.counter();
   }
 }

@@ -56,10 +56,17 @@ class CreepManager {
         if (freeWorkers.length !== 0) {
           const builders = site.pos.findClosestNByPath(freeWorkers, diff);
           builders.forEach((b) => {
+            // const action = {
+            //   type: 'build',
+            //   data: {
+            //     target: site.id
+            //   }
+            // }
             const action = {
-              type: 'build',
+              type: 'upgrade',
               data: {
-                target: site.id
+                target: '6357c627ad1c88d28ad8989a',
+                count: 3
               }
             }
             b.addAction(action);

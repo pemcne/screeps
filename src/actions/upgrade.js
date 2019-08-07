@@ -5,6 +5,9 @@ export default class Upgrade extends Action {
     this.target = Game.getObjectById(this.data.target);
   }
   isComplete() {
+    if (super.countComplete()) {
+      return true;
+    }
     // You can always upgrade a controller
     return false;
   }
@@ -29,5 +32,6 @@ export default class Upgrade extends Action {
       return referral;
     }
     this.creep.upgradeController(this.target);
+    super.counter();
   }
 }

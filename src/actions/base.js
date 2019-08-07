@@ -8,6 +8,21 @@ export default class Action {
     this.init();
   }
   init() {}
+  counter() {
+    if (this.data.count) {
+      if (!this.data.iteration) {
+        this.data.iteration = 1;
+      } else {
+        this.data.iteration++;
+      }
+    }
+  }
+  countComplete() {
+    if (this.data.count && this.data.iteration) {
+      return this.data.iteration > this.data.count;
+    }
+    return false;
+  }
   isComplete() {
     throw new Error('isComplete has not been implemented');
   }
