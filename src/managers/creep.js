@@ -41,6 +41,29 @@ class CreepManager {
     }
   }
   assignWorkers() {
+    this.base.controllers.forEach((controller) => {
+      if (controller.ticksToDowngrade < (controller.progressTotal * 0.33)) {
+        // Need to do an emergency upgrade
+        let worker = null;
+        if (this.freeWorkers.length > 0) {
+          worker = controller.pos.findClosestNByPath(this.freeWorkers, 1);
+        } else if (this.workers.length > 0) {
+          worker = controller.pos.findClosestNByPath(this.workers, 1);
+        }
+        if (!worker) {
+          console.log('WRNING: no worker to upgrade controller', controller.id);
+          return
+        }
+        const action = {
+          type: 'upgrade',
+          data: {
+            target: controller.id,
+            count: 100
+          }
+        };
+        worker.assignTask(action);
+      }
+    });
     this.checkBuilds();
   }
   checkBuilds() {

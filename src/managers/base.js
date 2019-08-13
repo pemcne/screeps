@@ -19,6 +19,10 @@ class BaseManager {
     const save = _.map(rooms, 'name');
     Memory.bases[this.name].rooms = save;
   }
+  get controllers() {
+    const ownedRooms = _.filter(this.rooms, room => room.controller.my);
+    return _.map(ownedRooms, (room) => room.controller);
+  }
   get spawns() {
     const spawns = Memory.bases[this.name].spawns;
     if (!spawns) {
