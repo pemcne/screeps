@@ -21,10 +21,10 @@ export class Worker extends BaseCreep {
     this.creep.memory.available = avail;
   }
   actionComplete(action) {
-    this.manager.actionComplete(action);
     if (action.type == 'build') {
       this.available = true;
     }
+    return super.actionComplete(action);
   }
   assignTask(action) {
     this.addAction(action);

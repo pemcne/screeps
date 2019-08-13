@@ -118,7 +118,7 @@ class RoomManager {
     if (Memory.scratch.containerCache[target.id] === undefined) {
       const container = this.chooseContainer(room, target.pos, range);
       // this.build(room, container, STRUCTURE_CONTAINER, target.id);
-      this.build(room, container, STRUCTURE_ROAD, target.id);
+      this.build(room, container, STRUCTURE_CONTAINER, target.id);
       // Put null in here as a placeholder to know that we started
       Memory.scratch.containerCache[target.id] = null;
     }

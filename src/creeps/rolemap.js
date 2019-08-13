@@ -1,14 +1,15 @@
 import { Harvester } from './roles/harvester';
 import { Worker } from './roles/worker';
+import { Hauler } from './roles/hauler';
 
-const RolePriority = ['worker', 'harvester'];
+const RolePriority = ['harvester', 'worker'];
 const RoleMap = {
   'harvester': {
     name: 'harvester',
     cls: Harvester,
-    baseBody: [WORK, CARRY, MOVE, MOVE],
+    baseBody: [WORK, WORK, CARRY, MOVE],
     repeatBody: [WORK, WORK, CARRY, MOVE],
-    minNumber: 3
+    minNumber: 2
   },
   'worker': {
     name: 'worker',
@@ -16,6 +17,13 @@ const RoleMap = {
     baseBody: [WORK, WORK, CARRY, MOVE],
     repeatBody: [WORK, WORK, CARRY, MOVE],
     minNumber: 4
+  },
+  'hauler': {
+    name: 'hauler',
+    cls: Hauler,
+    baseBody: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
+    repeatBody: [CARRY, MOVE],
+    minNumber: 1
   }
 };
 

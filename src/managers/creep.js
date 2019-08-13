@@ -1,4 +1,5 @@
 import { RoleMap, RolePriority } from '../creeps/rolemap';
+import ActionManager from '../managers/action';
 
 class CreepManager {
   constructor(base) {
@@ -25,8 +26,38 @@ class CreepManager {
   generateName(role) {
     return `${role}-${Game.time}`;
   }
-  actionComplete(action) {
-    if (action.type === 'build') {
+  actionComplete(creep, action) {
+    if (action.type === 'harvest') {
+      // Prefer to jump off at a container
+      const container = Memory.sources[action.data.target].container;
+      if (!container) {
+        // Try to put it at the spawn/extensions
+        let spawner = creep.room.find(FIND_MY_SPAWNS, {
+          filter: (s) => s.energy < s.energyCapacity
+        });
+        let target;
+        if (spawner.length) {
+          target = spawner[0].name;
+        } else {
+          spawner = creep.room.find(FIND_STRUCTURES, {
+            filter: (s) => s.structureType === STRUCTURE_EXTENSION && s.energy < s.energyCapacity
+          });
+          if (spawner === null) {
+            return
+          }
+          target = spawner.id;
+        }
+        const referral = {
+          type: 'transfer',
+          data: {
+            target: target,
+            type: RESOURCE_ENERGY,
+            direction: 'deposit'
+          }
+        }
+        return ActionManager.load(creep, referral);
+      }
+    } else if (action.type === 'build') {
       const site = action.data.target;
       delete Memory.constructionSites[site];
       for (const [key, value] of Object.entries(Memory.scratch.containerCache)) {
@@ -41,6 +72,7 @@ class CreepManager {
     }
   }
   assignWorkers() {
+    // Figure out if any controllers need an emergency upgrade
     this.base.controllers.forEach((controller) => {
       if (controller.ticksToDowngrade < (controller.progressTotal * 0.33)) {
         // Need to do an emergency upgrade
@@ -62,8 +94,30 @@ class CreepManager {
           }
         };
         worker.assignTask(action);
+        _.remove(this.freeWorkers, c => c.name === worker.name);
       }
     });
+    if (!this.creepRoles['harvester'] || this.creepRoles['harvester'].length < 2) {
+      if (this.freeWorkers.length > 0) {
+        // We're low on harvesters so just grab any source closest to the first spawn
+        const source = this.base.spawns[0].pos.findClosestByPath(FIND_SOURCES);
+        // Sanity check
+        if (source) {
+          const worker = source.pos.findClosestByPath(this.freeWorkers);
+          if (worker) {
+            const action = {
+              type: 'harvest',
+              data: {
+                target: source.id
+              },
+              repeat: true
+            };
+            worker.assignTask(action);
+            _.remove(this.freeWorkers, c => c.name === worker.name);
+          }
+        }
+      }
+    }
     this.checkBuilds();
   }
   checkBuilds() {

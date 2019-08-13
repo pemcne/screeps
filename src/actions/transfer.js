@@ -51,9 +51,9 @@ export default class Transfer extends Action {
       fn = this.creep.withdraw;
     }
     if (this.amount) {
-      fn(this.target, this.resourceType, this.amount);
+      fn.call(this.creep, this.target, this.resourceType, this.amount);
     } else {
-      fn(this.target, this.resourceType);
+      fn.call(this.creep, this.target, this.resourceType);
     }
   }
 }

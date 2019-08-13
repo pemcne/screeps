@@ -43,7 +43,7 @@ class BaseCreep {
 
   actionComplete(action) {
     // Placeholder so individual creeps can override it
-    this.manager.actionComplete(action);
+    return this.manager.actionComplete(this.creep, action);
   }
   run() {
     console.log(this.actions);
