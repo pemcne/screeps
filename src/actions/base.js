@@ -6,6 +6,15 @@ export default class Action {
     this.data = data.data;
     this.repeat = repeat;
     this.init();
+    if (!this.rawData.id) {
+      this.rawData.id = _.uniqueId(`${this.creep.name}-${this.type}`);
+    }
+    this.id = this.rawData.id;
+    if (this.rawData.dependsOn) {
+      this.dependsOn = this.rawData.dependsOn;
+    } else {
+      this.dependsOn = null;
+    }
   }
   init() {}
   counter() {
