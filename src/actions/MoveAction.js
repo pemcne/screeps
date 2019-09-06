@@ -1,4 +1,4 @@
-import Action from "./base";
+import Action from "./BaseAction";
 
 export default class Move extends Action {
   init() {

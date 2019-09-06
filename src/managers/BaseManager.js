@@ -1,5 +1,5 @@
-import RoomManager from './room';
-import CreepManager from './creep';
+import RoomManager from './RoomManager';
+import CreepManager from './CreepManager';
 
 class BaseManager {
   constructor(name) {

@@ -1,4 +1,4 @@
-import { BaseCreep } from "../base";
+import { BaseCreep } from "../BaseCreep";
 
 export class Worker extends BaseCreep {
   static getInitialActions(room) {

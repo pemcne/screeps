@@ -1,4 +1,4 @@
-import Action from "./base";
+import Action from "./BaseAction";
 
 export default class Transfer extends Action {
   init() {

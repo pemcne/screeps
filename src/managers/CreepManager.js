@@ -1,5 +1,5 @@
 import { RoleMap, RolePriority } from '../creeps/rolemap';
-import ActionManager from '../managers/action';
+import ActionManager from '../managers/ActionManager';
 
 class CreepManager {
   constructor(base) {

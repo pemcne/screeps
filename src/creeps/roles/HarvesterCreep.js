@@ -1,4 +1,4 @@
-import { BaseCreep } from '../base';
+import { BaseCreep } from '../BaseCree';
 import ActionManager from '../../managers/action';
 
 export class Harvester extends BaseCreep {

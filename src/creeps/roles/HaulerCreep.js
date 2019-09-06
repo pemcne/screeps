@@ -1,4 +1,4 @@
-import { BaseCreep } from "../base";
+import { BaseCreep } from "../BaseCree";
 
 export class Hauler extends BaseCreep {
   constructor(creep) {

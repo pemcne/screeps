@@ -1,6 +1,6 @@
-import Action from './base';
+import Action from "./BaseAction";
 
-export default class Upgrade extends Action {
+export default class Build extends Action {
   init() {
     this.target = Game.getObjectById(this.data.target);
   }
@@ -8,10 +8,9 @@ export default class Upgrade extends Action {
     if (super.countComplete()) {
       return true;
     }
-    // You can always upgrade a controller
-    return false;
+    return this.target === null
   }
-  run () {
+  run() {
     if (this.creep.carry[RESOURCE_ENERGY] === 0) {
       const referral = {
         type: 'query',
@@ -31,7 +30,7 @@ export default class Upgrade extends Action {
       };
       return referral;
     }
-    this.creep.upgradeController(this.target);
+    this.creep.build(this.target);
     super.counter();
   }
 }
