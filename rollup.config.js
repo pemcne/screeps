@@ -4,6 +4,7 @@ import clear from "rollup-plugin-clear";
 import resolve from "rollup-plugin-node-resolve";
 import commonjs from "rollup-plugin-commonjs";
 import screeps from "rollup-plugin-screeps";
+import typescript from "rollup-plugin-typescript2";
 
 let cfg;
 const dest = process.env.DEST;
@@ -14,7 +15,7 @@ if (!dest) {
 }
 
 export default {
-  input: "src/main.js",
+  input: "src/main.ts",
   output: {
     file: "dist/main.js",
     format: "cjs",
@@ -27,6 +28,7 @@ export default {
     }),
     resolve(),
     commonjs(),
+    typescript({tsconfig: "./tsconfig.json"}),
     screeps({
       config: cfg,
       dryRun: cfg == null
