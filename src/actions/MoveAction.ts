@@ -1,8 +1,9 @@
-import { Action } from "./Action";
+import { BaseAction } from "./BaseAction";
 
-export default class Move extends Action {
+export default class Move extends BaseAction {
   public target!: RoomPosition;
   public range!: number;
+  public data!: any;
   init() {
     this.target = this.data.target;
     this.range = this.data.range ? this.data.range : 1;

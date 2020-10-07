@@ -81,7 +81,6 @@ export default class RoomManager {
       x: container?.x,
       y: container?.y
     };
-    console.log("Adding new construction request", constructRequest.data);
     this.base.constructionRequests.push(constructRequest);
   }
   scan(room: Room) {
@@ -102,22 +101,18 @@ export default class RoomManager {
         // Remove any null values if there are some...
         sources = room.sources;
       }
-      console.log("All sources", sources);
       sources.forEach((source) => {
         if (source === null) {
           return;
         }
-        console.log("Looking at source", source, source.numFreeSpaces);
         if (source.numFreeSpaces === -1) {
           const freeSpaces = this.findFreeSpaces(room.name, source, terrain, 1);
-          console.log("Free spaces", source, freeSpaces.length);
           source.numFreeSpaces = freeSpaces.length;
         }
         this.buildContainer(source, room.name, 1);
       });
       room.scanned = Game.time;
     } else {
-      console.log("Skipping scan", room.scanned, Game.time);
     }
   }
   init() {}

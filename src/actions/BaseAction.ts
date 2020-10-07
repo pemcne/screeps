@@ -1,23 +1,12 @@
-enum ActionType {
-  Harvest = "HARVEST",
-  Move = "MOVE",
-  Transfer = "TRANSFER",
-  Upgrade = "UPGRADE",
-  Build = "BUILD"
-}
+const newAction = (type: ActionType, data: any, repeat = false): ActionItem => {
+  return {
+    type: type,
+    data: data,
+    repeat: repeat
+  };
+};
 
-interface ActionItem {
-  type: ActionType;
-  data: { [key: string]: any };
-  repeat?: boolean;
-}
-
-interface ReferralItem {
-  type: ActionType;
-  query?: string;
-}
-
-abstract class Action {
+abstract class BaseAction implements Action {
   public type: ActionType;
   public data: { [key: string]: any };
   public id: string;
@@ -36,7 +25,7 @@ abstract class Action {
     // }
   }
   abstract isComplete(): boolean;
-  abstract run(): ActionItem | ReferralItem | null;
+  abstract run(): ActionItem | null;
   init() {}
   public counter() {
     if (this.data.count) {
@@ -55,4 +44,4 @@ abstract class Action {
   }
 }
 
-export { Action, ActionType, ActionItem, ReferralItem };
+export { BaseAction, newAction };

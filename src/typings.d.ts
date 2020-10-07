@@ -1,4 +1,10 @@
 declare const _;
+
+interface CreepMemory {
+  role: string;
+  harvester?: any;
+  actions: any;
+}
 interface RoomMemory {
   scanned: number;
   sources: Id<Source>[];
@@ -9,12 +15,13 @@ interface SourceMemory {
 }
 interface BaseMemory {
   rooms: string[];
-  creeps: Id<Creep>[];
+  creeps: string[];
   constructionRequests: any[];
 }
 interface Memory {
   sources: { [name: string]: SourceMemory };
   bases: { [name: string]: BaseMemory };
+  creeps: { [name: string]: CreepMemory };
 }
 
 interface Room {

@@ -1,6 +1,6 @@
-import { Action, ActionItem, ActionType, ReferralItem } from "./Action";
+import { BaseAction } from "./BaseAction";
 
-export default class Build extends Action {
+export default class Build extends BaseAction {
   public target!: ConstructionSite;
   init() {
     const search: ConstructionSite | null = Game.getObjectById(this.data.target);

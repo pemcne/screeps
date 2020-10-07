@@ -1,6 +1,6 @@
-import { Action, ActionItem, ActionType } from "./Action";
+import { BaseAction, newAction } from "./BaseAction";
 
-export default class Harvest extends Action {
+export default class Harvest extends BaseAction {
   public source!: Source;
   init() {
     const sourceSearch: Source | null = Game.getObjectById(this.data.target);
@@ -10,20 +10,18 @@ export default class Harvest extends Action {
     this.source = sourceSearch;
   }
   isComplete() {
-    return this.creep.carry.getFreeCapacity() === 0;
+    return this.creep.store.getFreeCapacity() === 0;
   }
   run() {
     // See if we need to refer to moveTo
     if (!this.creep.pos.isNearTo(this.source?.pos.x, this.source?.pos.y)) {
-      const referral: ActionItem = {
-        type: ActionType.Move,
-        data: {
-          target: {
-            x: this.source.pos.x,
-            y: this.source.pos.y
-          }
+      const targetData = {
+        target: {
+          x: this.source.pos.x,
+          y: this.source.pos.y
         }
       };
+      const referral = newAction(ActionType.Move, targetData);
       return referral;
     }
     this.creep.harvest(this.source);
