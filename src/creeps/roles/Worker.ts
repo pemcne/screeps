@@ -1,5 +1,6 @@
 import BaseCreep from "creeps/BaseCreep";
 import { newAction } from "actions/BaseAction";
+import { ActionType } from "actions";
 
 export default class Worker extends BaseCreep {
   public static baseBody: BodyPartConstant[] = [WORK, WORK, CARRY, MOVE];

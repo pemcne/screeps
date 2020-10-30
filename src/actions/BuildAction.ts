@@ -1,3 +1,4 @@
+import { ActionType } from "actions";
 import { BaseAction } from "./BaseAction";
 
 export default class Build extends BaseAction {

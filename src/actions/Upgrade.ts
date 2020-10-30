@@ -1,3 +1,4 @@
+import { ActionType } from "actions";
 import { BaseAction, newAction } from "./BaseAction";
 
 export default class Upgrade extends BaseAction {

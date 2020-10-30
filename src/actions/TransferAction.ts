@@ -1,3 +1,4 @@
+import { ActionType, TransferDirection } from "actions";
 import { BaseAction, newAction } from "./BaseAction";
 
 export default class Transfer extends BaseAction {

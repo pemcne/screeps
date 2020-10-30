@@ -1,3 +1,4 @@
+import { ActionType, TransferDirection } from "actions";
 import { newAction } from "actions/BaseAction";
 import BaseCreep from "creeps/BaseCreep";
 import ActionManager from "managers/ActionManager";

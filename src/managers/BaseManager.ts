@@ -1,6 +1,13 @@
+import { RoleType } from "creeps";
 import ConstructionRequest from "requests/ConstructionRequest";
 import CreepManager from "./CreepManager";
 import RoomManager from "./RoomManager";
+
+enum Foo {
+  a,
+  b,
+  c
+}
 
 export default class BaseManager {
   public name: string;
@@ -44,6 +51,8 @@ export default class BaseManager {
   }
   run() {
     console.log(`Running base ${this.name}`);
+    console.log("Worker", RoleType.worker);
+    console.log(Foo.a);
     const creepManager = new CreepManager(this);
     creepManager.run();
     const roomManager = new RoomManager(this);

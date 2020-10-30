@@ -1,13 +1,7 @@
-declare enum RoleType {
-  harvester = "harvester",
-  worker = "worker",
-  hauler = "hauler"
-}
-
 declare interface CreepRole {
   creep: Creep;
   actions: Action[];
-  role: RoleType;
+  role: string;
   name: string;
   actionComplete(action: Action): Action | null;
   pos: RoomPosition;

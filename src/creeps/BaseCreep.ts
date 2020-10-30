@@ -1,6 +1,8 @@
 import CreepManager from "managers/CreepManager";
 import ActionManager from "managers/ActionManager";
 import { newAction } from "actions/BaseAction";
+import { ActionType, TransferDirection } from "actions";
+import { RoleType } from "creeps";
 
 export default abstract class BaseCreep implements CreepRole {
   public creep: Creep;

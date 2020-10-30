@@ -1,13 +1,18 @@
 import BaseManager from "./BaseManager";
 import Harvester from "creeps/roles/Harvester";
-import { RoleMap } from "creeps/roles/Role";
+import Worker from "creeps/roles/Worker";
+import { RoleType } from "creeps";
+
+const RoleMap = new Map();
+RoleMap.set(RoleType.harvester, Harvester);
+RoleMap.set(RoleType.worker, Worker);
 
 export default class CreepManager {
   private base: BaseManager;
   private creeps: CreepRole[] = [];
   private creepRoles: { [name: string]: CreepRole[] } = {};
   // private freeWorkers: BaseCreep[] = [];
-  private rolePriority: RoleType[] = [RoleType.harvester];
+  private rolePriority: RoleType[] = [RoleType.worker];
   constructor(base: BaseManager) {
     this.base = base;
     this.loadCreeps();
@@ -25,6 +30,8 @@ export default class CreepManager {
   }
   private loadCreepRole(role: RoleType, creep: Creep): CreepRole {
     switch (role) {
+      case RoleType.worker:
+        return new Worker(creep, this);
       case RoleType.harvester:
         return new Harvester(creep, this);
       default:

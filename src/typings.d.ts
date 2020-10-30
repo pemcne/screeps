@@ -34,10 +34,3 @@ interface Source {
   container: StructureContainer | null;
   numFreeSpaces: number;
 }
-interface Request {
-  requester: any;
-  target: any;
-  fulfiller: any;
-  data?: any;
-  isComplete(): boolean;
-}

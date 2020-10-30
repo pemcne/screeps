@@ -1,3 +1,5 @@
+import { ActionType } from "actions";
+
 const newAction = (type: ActionType, data: any, repeat = false): ActionItem => {
   return {
     type: type,
