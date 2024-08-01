@@ -44,7 +44,8 @@ export default class Harvester extends BaseCreep {
     if (!this.creep.memory.harvester) {
       return null;
     }
-    return Game.getObjectById(this.creep.memory.harvester.source);
+    const obj = Game.getObjectById(this.creep.memory.harvester.source);
+    return obj as Source
   }
   private findDeposit(): StructureSpawn | StructureExtension | null {
     // See if there's an extension

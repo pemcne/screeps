@@ -24,7 +24,7 @@ export default class BaseManager {
     this.name = name;
     this.init();
   }
-  static newBase(name: string, room: Id<Room>) {
+  static newBase(name: string, room: string) {
     // Just bootstrap
     Memory.bases[name] = {
       rooms: [room],

@@ -8,7 +8,7 @@ export const loop = () => {
   initMemory();
   console.log("done with memory");
   if (Object.keys(Memory.bases).length === 0) {
-    BaseManager.newBase("base1", Object.keys(Game.rooms)[0] as Id<Room>);
+    BaseManager.newBase("base1", Object.keys(Game.rooms)[0]);
   }
   for (let name in Memory.bases) {
     const base = new BaseManager(name);
