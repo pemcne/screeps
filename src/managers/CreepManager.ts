@@ -12,7 +12,7 @@ export default class CreepManager {
   private creeps: CreepRole[] = [];
   private creepRoles: { [name: string]: CreepRole[] } = {};
   // private freeWorkers: BaseCreep[] = [];
-  private rolePriority: RoleType[] = [RoleType.worker];
+  private rolePriority: RoleType[] = [RoleType.harvester];
   constructor(base: BaseManager) {
     this.base = base;
     this.loadCreeps();

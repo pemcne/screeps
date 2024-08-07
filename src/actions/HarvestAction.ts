@@ -3,8 +3,9 @@ import { BaseAction, newAction } from "./BaseAction";
 
 export default class Harvest extends BaseAction {
   public source!: Source;
+  public data!: HarvestActionData;
   init() {
-    const sourceSearch: Source | null = Game.getObjectById(this.data.target as Id<Source>);
+    const sourceSearch: Source | null = Game.getObjectById(this.data.target);
     if (sourceSearch === null) {
       throw new Error(`Unknown error passed into harvest: ${this.data.target}`);
     }

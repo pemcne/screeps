@@ -1,4 +1,3 @@
-import ConstructionRequest from "requests/ConstructionRequest";
 import BaseManager from "./BaseManager";
 
 export default class RoomManager {
@@ -74,15 +73,6 @@ export default class RoomManager {
     }
     return freeSpaces;
   }
-  buildContainer(target: Source, roomName: string, range: number) {
-    const container = this.chooseContainer(roomName, target.pos, range);
-    const constructRequest = new ConstructionRequest(this.base.name, STRUCTURE_CONTAINER);
-    constructRequest.data = {
-      x: container?.x,
-      y: container?.y
-    };
-    this.base.constructionRequests.push(constructRequest);
-  }
   scan(room: Room) {
     const scanThreshold = 300;
     if (room.scanned === undefined || room.scanned + scanThreshold < Game.time) {
@@ -109,7 +99,6 @@ export default class RoomManager {
           const freeSpaces = this.findFreeSpaces(room.name, source, terrain, 1);
           source.numFreeSpaces = freeSpaces.length;
         }
-        this.buildContainer(source, room.name, 1);
       });
       room.scanned = Game.time;
     } else {

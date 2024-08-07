@@ -1,6 +1,6 @@
 import { ActionType } from "actions";
 
-const newAction = (type: ActionType, data: any, repeat = false): ActionItem => {
+const newAction = (type: ActionType, data: ActionData, repeat = false): ActionItem => {
   return {
     type: type,
     data: data,
@@ -10,16 +10,17 @@ const newAction = (type: ActionType, data: any, repeat = false): ActionItem => {
 
 abstract class BaseAction implements Action {
   public type: ActionType;
-  public data: { [key: string]: any };
+  public data: ActionData;
   public id: string;
-  constructor(public creep: Creep, public rawData: { [key: string]: any }, public repeat: boolean = false) {
-    this.type = rawData.type;
+  constructor(public creep: Creep, public rawData: ActionItem, public repeat: boolean = false) {
+    this.type = rawData.type as ActionType;
     this.data = rawData.data;
     this.init();
-    if (!this.rawData.id) {
-      this.rawData.id = _.uniqueId(`${this.creep.name}-${this.type}`);
+    if (this.rawData.id === undefined) {
+      this.id = _.uniqueId(`${this.creep.name}-${this.type}`);
+    } else {
+      this.id = this.rawData.id;
     }
-    this.id = this.rawData.id;
     // if (this.rawData.dependsOn) {
     //   this.dependsOn = this.rawData.dependsOn;
     // } else {
@@ -28,7 +29,7 @@ abstract class BaseAction implements Action {
   }
   abstract isComplete(): boolean;
   abstract run(): ActionItem | null;
-  init() {}
+  init() { }
   public counter() {
     if (this.data.count) {
       if (!this.data.iteraction) {

@@ -3,9 +3,10 @@ import { BaseAction } from "./BaseAction";
 export default class Move extends BaseAction {
   public target!: RoomPosition;
   public range!: number;
-  public data!: any;
+  public data!: MoveActionData;
   init() {
     this.target = this.data.target;
+    console.log(`Move data: ${JSON.stringify(this.target)}`)
     this.range = this.data.range ? this.data.range : 1;
   }
   isComplete() {

@@ -16,7 +16,6 @@ interface SourceMemory {
 interface BaseMemory {
   rooms: string[];
   creeps: string[];
-  constructionRequests: any[];
 }
 interface Memory {
   sources: { [name: string]: SourceMemory };

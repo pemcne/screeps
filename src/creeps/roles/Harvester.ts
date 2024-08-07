@@ -60,9 +60,9 @@ export default class Harvester extends BaseCreep {
     if (ext.length !== 0) {
       return ext[0];
     }
-    const spawn = this.creep.room.find(FIND_MY_SPAWNS);
-    if (spawn.length !== 0) {
-      return spawn[0];
+    const spawns = this.creep.room.find(FIND_MY_SPAWNS);
+    if (spawns.length !== 0) {
+      return spawns[0];
     }
     return null;
   }
