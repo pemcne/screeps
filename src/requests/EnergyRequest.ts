@@ -1,27 +1,41 @@
 export default class EnergyRequest implements Request {
-  public requester!: string;
-  public fulfiller!: (Creep | AnyStoreStructure)[];
-  public target!: Creep | AnyStoreStructure;
-  public data!: EnergyRequestData;
-  constructor(requester: string) {
-    this.requester = requester;
+  public target: AnyStoreStructure;
+  public priority: number;
+  public total: number;
+  public progress!: number;
+  public fulfiller!: Creep[];
+
+  constructor(target: AnyStoreStructure, priority: number, total: number) {
+    this.target = target;
+    this.priority = priority;
+    this.total = total;
+    this.progress = 0;
+    this.fulfiller = [];
   }
-  isComplete() {
-    return this.data.progress >= this.data.total;
+
+  public isComplete() {
+    return this.progress >= this.total;
   }
-  export() {
+
+  public export() {
     return {
-      requester: this.requester,
-      fulfiller: this.fulfiller?.map((t: Creep | AnyStoreStructure) => t.id),
-      target: this.target?.id,
-      data: this.data
+      target: this.target.id,
+      priority: this.priority,
+      total: this.total,
+      progress: this.progress,
+      fulfiller: _.map(this.fulfiller, 'id')
     };
   }
-  static load(importData: any) {
-    const c = new EnergyRequest(importData.requester);
-    c.fulfiller = importData.fulfiller;
-    c.target = importData.target;
-    c.data = importData.data;
-    return c;
+  public static load(data: any) {
+    const target = Game.getObjectById(data.target as Id<AnyStoreStructure>);
+    if (target === null) {
+      console.log('ERR: Unable to load energy request target: %s', data.target);
+      return undefined;
+    }
+    const r = new EnergyRequest(target, data.priority, data.total);
+    r.progress = data.progress;
+    const 
+    r.fulfiller = data.fulfiller;
+    return r;
   }
 }

@@ -5,6 +5,7 @@ import RoomManager from "./RoomManager";
 export default class BaseManager {
   public name: string;
   public rooms: Room[] = [];
+  public requests: BaseRequest[] = [];
   public creeps: { [name: string]: Creep | null } = {};
   private get memory(): BaseMemory {
     if (Memory.bases[this.name] === undefined) {
@@ -31,6 +32,7 @@ export default class BaseManager {
       this.creeps[name] = obj !== undefined ? obj : null;
     });
     this.rooms = this.memory.rooms.map((room) => Game.rooms[room]);
+    this.
   }
   save() {
     this.memory.creeps = Object.keys(this.creeps);

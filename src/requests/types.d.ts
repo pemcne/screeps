@@ -1,13 +1,9 @@
 declare interface Request {
-  requester: any;
   target: any;
-  fulfiller: any;
-  data?: any;
-  isComplete(): boolean;
-}
-
-declare interface EnergyRequestData {
-  progress: number;
-  committed: number;
+  priority: number;
   total: number;
+  progress: number;
+  fulfiller?: Creep[];
+  isComplete(): boolean;
+  export(): {[key: string]: any};
 }
